@@ -1,5 +1,6 @@
 from tinydb import TinyDB, Query
 db = TinyDB('data.json')
+test = "RR"
 
 class Player:
     def __init__(self, surname, name, birthdate, id, score = 0.0):
@@ -24,6 +25,17 @@ class Player:
     
     def __str__(self):
         return self.surname, self.name, self.birthdate, self.id, self.score
+    
+
+class Json :
+    def __init__(self):
+        self.db = db
+    def show_players(self) :
+        table = self.db.table("players")
+        print("\n")
+        for item in table.all():
+            print(item)
+       
 
 
 

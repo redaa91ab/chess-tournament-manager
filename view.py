@@ -3,7 +3,7 @@ from rich import print
 
 class View:
     def show_menu(self):
-        print("[bold green]MAIN MENU :\n[/bold green]")
+        print("[bold green]\nMAIN MENU :\n[/bold green]")
         print("1) New tournament")
         print("2) Load tournament")
         print("3) Manage players")
