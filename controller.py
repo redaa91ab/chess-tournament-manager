@@ -6,6 +6,7 @@ class Controller:
     def __init__(self):
         self.view = View()
 
+
     def new_tournament(self):
 
         #tournament_informations
@@ -21,7 +22,7 @@ class Controller:
         self.view.show_message("\n[bold green]New tournament[/bold green]\n")
         while number_players < 4 :
             id = self.view.get_input("Add a player (National Chess ID) :")
-            add_player = tournament.add_players_fromID(id)
+            add_player = tournament.add_players_fromID(id) #create the player instance  and save it in tournament
             number_players += 1
 
             if add_player == None :
@@ -31,10 +32,6 @@ class Controller:
                 player = Player(id, name, surname, birthdate)
                 player.save_json()
                 tournament.add_players_fromID(id)
-                
-                
-
-
         
         #Menu
         while self.new_tournament:
@@ -43,22 +40,22 @@ class Controller:
             self.view.show_message("\n1) Add new players")
             self.view.show_message("2) Start the tournament")
             self.view.show_message("3)[red] Back[/red]")
-            print(tournament.players)
             input_live = self.view.get_input("\nChoose an option : ")
             if input_live == "1" or input_live == "1)":
                 self.view.show_message("\n[bold green]New tournament[/bold green]\n")
-                while number_players >= 4 :
+                for i in range(2) :
                 
-                    national_id =self.view.get_input("Add a player (National Chess ID) :")
+                    id = self.view.get_input("Add a player (National Chess ID) :")
+                    add_player = tournament.add_players_fromID(id)
                     number_players += 1
 
-
-
-                    self.view.get_input("Add a player (National Chess ID) :")
-                    number_players += 1
-                    break
-
-
+                    if add_player == None :
+                        name = self.view.get_input("Name : ")
+                        surname = self.view.get_input("Surname : ")
+                        birthdate = self.view.get_input("Birthdate : ")
+                        player = Player(id, name, surname, birthdate)
+                        player.save_json()
+                        tournament.add_players_fromID(id)
 
         
     def ManagePlayers(self):
@@ -91,6 +88,7 @@ class Controller:
 
         if input_live == "1" or input_live == "1)":
             self.new_tournament()
+
         elif input_live == "3" or input_live == "3)" :
             self.ManagePlayers()
         else :

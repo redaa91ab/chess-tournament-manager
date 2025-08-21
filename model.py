@@ -10,9 +10,6 @@ class Tournament:
         self.players = players
 
     def add_players_fromID(self, id):
-        #self.players.append(player)
-        #print("List of players for this tournament :", self.players)
-        
 
         # Parcourir les joueurs
         table = db.table("players")
@@ -20,20 +17,20 @@ class Tournament:
         for player in table.all():
             if player.get("National chess ID") == id:
                 current_player = player
-                break  # on arrête dès qu’on trouve
+                break
 
         if current_player:
             name      = current_player["Name"]
             surname   = current_player["Surname"]
             birthdate = current_player["Birthdate"]
             score     = current_player["Score"]
-            print("We've found your player :",current_player)
+            print(f"{surname} {name} ({id}) was successfully added !")
             self.players.append(Player(id, name, surname, birthdate, score))
-            print(self.players)
-            return
+            return self
         else:
-            print("We need more information to create a class player")
+            print("We need more information to add your player ")
             return None
+
 
 
 class Player:
@@ -56,9 +53,6 @@ class Player:
             "Birthdate": self.birthdate,
             "Score": self.score
         })
-
-
-
     
     def __str__(self):
         return self.surname, self.name, self.birthdate, self.id, self.score
