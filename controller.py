@@ -1,4 +1,4 @@
-from model import *
+from models import *
 from view import *
 from rich import print
 
@@ -33,6 +33,7 @@ class Controller:
                 player.save_json()
                 tournament.add_players_fromID(id)
         
+        
         #Menu
         while self.new_tournament:
 
@@ -66,8 +67,8 @@ class Controller:
         input_manageplayers = self.view.get_input("\nChoose an option : ")
 
         if input_manageplayers == "1" or input_manageplayers == "1)" :
-            json_instance = Json()
-            json_instance.show_players()
+            players = Player()
+            players.show_players_json()
             self.ManagePlayers()
 
         elif input_manageplayers == "2" or input_manageplayers == "2)" :
