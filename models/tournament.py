@@ -24,9 +24,9 @@ class Tournament:
             surname   = current_player["Surname"]
             birthdate = current_player["Birthdate"]
             score     = current_player["Score"]
-            print(f"{surname} {name} ({id}) was successfully added !\n")
-            self.players.append(Player(id, name, surname, birthdate, score))
-            return self
+            current_player = Player(id, name, surname, birthdate, score)
+            self.players.append(current_player)
+            return self, current_player
+            
         else:
-            print("We need more information to add your player ")
             return None

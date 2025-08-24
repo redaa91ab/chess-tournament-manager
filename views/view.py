@@ -15,5 +15,4 @@ class View:
         return input(input_user)
 
     def show_message(self, message):
-        self.message = message
-        print(self.message)
+        print(message)

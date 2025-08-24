@@ -24,11 +24,13 @@ class Player:
 
     def show_players_json(self):
         table = db.table("players")
-        print("")
+        players_list = []
         for item in table.all():
-            print(item)
+            players_list.append(item)
+        
+        return players_list
 
-    
+
     def __str__(self):
         return self.surname, self.name, self.birthdate, self.id, self.score
     

@@ -1,8 +1,8 @@
 from models import *
-from view import *
-from controller import *
+from views import *
+from controllers import *
 
 
 if __name__ == "__main__" :
-    controller = Controller()
-    controller.run()
+    run_controller = Run()
+    run_controller.run()
