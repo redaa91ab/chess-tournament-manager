@@ -61,9 +61,9 @@ class NewTournament:
                     input_live = "0"
 
             while input_live == "2" or input_live == "2)" :
-                pass
+                self.parent.run_start()
 
             while input_live == "3" or input_live == "3)" :
-                self.parent.run()
+                pass
 
 

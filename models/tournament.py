@@ -12,8 +12,12 @@ class Tournament:
         self.end_date = end_date
         self.rounds_number = rounds_number
         self.players = players
+        self.actual_round = 1
+        self.rounds_list = []
+        self.manager_comment = None
 
     def save_json(self):
+
         tournament_table.upsert({
             "Tournament name": self.name,
             "Start date" : self.start_date,
@@ -21,4 +25,11 @@ class Tournament:
             "Place": self.place,
             "Rounds number": self.rounds_number,
             "Players": self.players,
+            "Actual round" : self.actual_round,
+            "Rounds list" : self.rounds_list,
+            "Manager comment" : self.manager_comment
         }, (Query()['Tournament name'] == self.name))
+
+
+
+

@@ -13,20 +13,25 @@ class View:
 class MainMenu(View) :
     def show(self):
         print("[bold green]\nMAIN MENU :\n[/bold green]")
-        print("1) New tournament")
-        print("2) Load tournament")
-        print("3) Manage players")
-        print("4) Tournament reports")
-        print("[red]5) Exit[/red]")
+        print("1) Start")
+        print("2) Manage players")
+        print("3) Tournament reports")
+        print("[red]4) Exit[/red]")
+
+class StartMenu(View):
+    def show(self):
+        print("\n[bold green]Start[/bold green]\n")
+        print("1) Create a new tournament")
+        print("2) Choose an existing tournament")
+        print("3)[red] Back [/red]")
 
 class NewTournamentMenu(View) :
     def show(self):
         print("\n[bold green]New tournament[/bold green]")
         print("\n1) Add new players")
-        print("2) Start the tournament")
-        print("3)[red] Back[/red]")
+        print("2)[red] Back[/red]")
 
-        
+
 class ManagePlayersMenu(View):
     def show(self):
         print("\n[bold green]Manage Players :[/bold green]\n")
