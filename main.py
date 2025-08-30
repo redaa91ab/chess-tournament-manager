@@ -1,8 +1,10 @@
-from models import *
-from views import *
-from controllers import *
-
+from controllers import AppController
 
 if __name__ == "__main__" :
-    run_controller = Run()
-    run_controller.run()
+    app_controller = AppController()
+    app_controller.run()
+
+
+
+
+

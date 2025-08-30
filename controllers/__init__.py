@@ -1,7 +1,6 @@
-from .manage_players import ManagePlayers
-from .run import Run
-from .new_tournament import NewTournament
-from .start_tournament import StartTournament
+from .app_controller import AppController
+from .players_controller import PlayersController
+from .tournaments_controller import TournamentsController
 
     
 

@@ -33,3 +33,33 @@ class Tournament:
 
 
 
+
+    def return_details(self, tournament_name):
+        TournamentQuery = Query()
+        tournaments = tournament_table.search(TournamentQuery["Tournament name"] == tournament_name)
+
+        
+        if tournaments:
+            tournament = tournaments[0]
+            players = tournament.get("Players", [])
+            tournament_table.update({"Players": players}, TournamentQuery["Tournament name"] == tournament_name)
+        else :
+            return None
+
+
+
+
+    @classmethod
+    def add_player(cls, tournament_name, player):
+        TournamentQuery = Query()
+        tournaments = tournament_table.search(TournamentQuery["Tournament name"] == tournament_name)
+
+        if tournaments:
+            tournament = tournaments[0]
+            players = tournament.get("Players", [])
+            players.append(player)
+            tournament_table.update({"Players": players}, TournamentQuery["Tournament name"] == tournament_name)
+
+
+    
+
