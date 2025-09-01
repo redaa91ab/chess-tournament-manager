@@ -4,16 +4,30 @@ from rich import print
 
 
 class PlayersController: 
+    """
+    A controller class for managing player. 
+    It provides methods to display all the players and adding new players to the database
+    """
     def __init__(self, parent):
+        """
+        Initialize a PlayersController instance.
+
+        Args:
+            parent: app_controller.py
+        """
         self.view = View()
         self.parent = parent
 
     def players_list(self):
-        self.view.show_message(Player.players_list())
+        """
+        Display the list of all players using the method return_players of the Player model.
+        """
+        self.view.show_message(Player.return_players())
 
     def add_player(self) :
         """ 
-        Save the player in players.json by sending the players details to the function save_json of the player model"""
+        Collect the player details, then use the methods save_json of the Player model.
+        """
 
         self.view.show_message("\nEnter the new player details below :")
         id = self.view.get_input("National chess ID : ")
