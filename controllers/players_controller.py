@@ -1,5 +1,4 @@
 from models import Player
-from views import View
 from rich import print
 
 class PlayersController: 
@@ -8,14 +7,14 @@ class PlayersController:
     It provides methods to display all the players and adding new players to the database
     """
 
-    def __init__(self, parent):
+    def __init__(self, view, parent= None):
         """
         Initialize a PlayersController instance.
 
         Args:
             parent: app_controller.py
         """
-        self.view = View()
+        self.view = view
         self.parent = parent
 
     def display_all_players(self):

@@ -49,9 +49,9 @@ class AppController:
         self.view.show_tournaments_menu()
         user_choice = self.view.get_input("\nChoose an option : ")
         while user_choice == "1" or user_choice == "1)": 
-            TournamentsController(self).create()
+            TournamentsController(self.view, self).create()
         while user_choice == "2" or user_choice == "2)":
-            TournamentsController(self).add_player_tournament()
+            TournamentsController(self.view, self).add_player_tournament()
         while user_choice == "3" or user_choice == "3)":
             pass
         while user_choice == "4" or user_choice == "4)":   
@@ -66,10 +66,10 @@ class AppController:
         self.view.show_manage_players_menu()
         user_choice = self.view.get_input("\nChoose an option : ")
         while user_choice == "1" or user_choice == "1)":
-            PlayersController(self).display_all_players()
+            PlayersController(self.view, self).display_all_players()
             self.manage_players()
         while user_choice == "2" or user_choice == "2)":
-            PlayersController(self).add_player()
+            PlayersController(self.view, self).add_player()
             self.manage_players()
         while user_choice == "3" or user_choice == "3)":
             self.run()

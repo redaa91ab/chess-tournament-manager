@@ -1,5 +1,4 @@
 from models import Tournament, Player
-from views import View
 from rich import print
 
 
@@ -9,7 +8,7 @@ class TournamentsController:
     It provides methods to create a new tournament in tournaments.json and add new players to a tournament
     """
 
-    def __init__(self, parent):
+    def __init__(self,view, parent = None):
         """
         Initialize a TournamentsController instance.
 
@@ -17,7 +16,7 @@ class TournamentsController:
             parent : app_controller.py
         """
         self.parent = parent
-        self.view = View()
+        self.view = view
 
     def create(self):
         """
