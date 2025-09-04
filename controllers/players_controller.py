@@ -12,6 +12,7 @@ class PlayersController:
         Initialize a PlayersController instance.
 
         Args:
+            view: An instance of the View class
             parent: app_controller.py
         """
         self.view = view

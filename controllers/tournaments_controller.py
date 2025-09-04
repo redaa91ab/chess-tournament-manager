@@ -13,6 +13,7 @@ class TournamentsController:
         Initialize a TournamentsController instance.
 
         Args:
+            view: An instance of the View class
             parent : app_controller.py
         """
         self.parent = parent
@@ -26,9 +27,21 @@ class TournamentsController:
         self.view.show_message("Enter the new tournament details below : ")
         tournament_name = self.view.get_input("Tournament name : ")
         place = self.view.get_input("Place : ")
-        start_date = self.view.get_input("Start date : ")
-        end_date = self.view.get_input("End date : ")
+        start_date = self.view.get_input("Start date (DD/MM/YYYY) : ")
+        end_date = self.view.get_input("End date (DD/MM/YYYY): ")
         number_of_rounds = self.view.get_input("Number of rounds : ")
+
+        try:
+            number_of_rounds = int(number_of_rounds)
+            if number_of_rounds <= 0:
+                raise ValueError("Number of rounds must be positive")
+            from datetime import datetime
+            datetime.strptime(start_date, "%d/%m/%Y")
+            datetime.strptime(end_date, "%d/%m/%Y")
+        except ValueError as e:
+            self.view.show_message(f"Invalid input: {e}")
+            return
+
         tournament = Tournament(tournament_name, place, start_date, end_date, number_of_rounds)
         tournament.save_json()
         self.add_player_tournament(tournament_name)
