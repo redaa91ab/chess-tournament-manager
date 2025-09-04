@@ -26,7 +26,7 @@ class Tournament:
             players : A list of player National Chess IDs. Defaults to an empty list.
 
         """
-        self.name = tournament_name
+        self.tournament_name = tournament_name.upper()
         self.place = place
         self.start_date = start_date
         self.end_date = end_date
@@ -41,7 +41,7 @@ class Tournament:
         Save the tournament's details to the tournaments JSON database.
         """
         tournament_table.upsert({
-            "Tournament name": self.name,
+            "Tournament name": self.tournament_name,
             "Start date" : self.start_date,
             "End date": self.end_date,
             "Place": self.place,
@@ -50,7 +50,7 @@ class Tournament:
             "Actual round" : self.actual_round,
             "Rounds list" : self.rounds_list,
             "Manager comment" : self.manager_comment
-        }, (Query()['Tournament name'] == self.name))
+        }, (Query()['Tournament name'] == self.tournament_name))
 
     @classmethod
     def get_tournament_details(cls, tournament_name):

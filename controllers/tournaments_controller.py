@@ -44,7 +44,7 @@ class TournamentsController:
 
         tournament = Tournament(tournament_name, place, start_date, end_date, number_of_rounds)
         tournament.save_json()
-        self.add_player_tournament(tournament_name)
+        self.add_player_tournament(tournament.tournament_name)
 
     def add_player_tournament(self, tournament_name = None):
         """
@@ -58,7 +58,8 @@ class TournamentsController:
         If a player doesn't exist, offers the option to create a new player or try again.
         """
         while tournament_name == None :
-            user_input = self.view.get_input("\nEnter the tournament name : ") 
+            user_input = self.view.get_input("\nEnter the tournament name : ")
+            user_input = user_input.upper() 
             if Tournament.get_tournament_details(user_input) == None :
                 self.view.show_message("We didn't find any match, please try again")
             else :
