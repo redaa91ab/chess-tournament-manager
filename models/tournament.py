@@ -1,9 +1,8 @@
-from config import Data_Players_JSON, Data_Tournaments_JSON
+from config import DATA_PLAYERS_PATH, DATA_TOURNAMENTS_PATH
 from tinydb import TinyDB, Query
-db_players = TinyDB(Data_Players_JSON)
-db_tournaments = TinyDB(Data_Tournaments_JSON)
+db_players = TinyDB(DATA_PLAYERS_PATH)
+db_tournaments = TinyDB(DATA_TOURNAMENTS_PATH)
 tournament_table = db_tournaments.table("tournaments")
-
 
 class Tournament:
     """
@@ -14,7 +13,7 @@ class Tournament:
     retrieve or update tournament information.
     """
 
-    def __init__(self, tournament_name, place, start_date, end_date, rounds_number = 3, players = []):
+    def __init__(self, tournament_name, place, start_date, end_date, number_of_rounds = 3, players = []):
         """
         Initialize a Tournament instance with the provided details.
 
@@ -23,15 +22,15 @@ class Tournament:
             place : The location of the tournament.
             start_date : The start date of the tournament.
             end_date : The end date of the tournament.
-            rounds_number : The number of rounds in the tournament. Defaults to 3.
-            players : A list of player IDs. Defaults to an empty list.
+            number_of_rounds : The number of rounds in the tournament. Defaults to 3.
+            players : A list of player National Chess IDs. Defaults to an empty list.
 
         """
         self.name = tournament_name
         self.place = place
         self.start_date = start_date
         self.end_date = end_date
-        self.rounds_number = rounds_number
+        self.number_of_rounds = number_of_rounds
         self.players = players
         self.actual_round = 1
         self.rounds_list = []
@@ -46,7 +45,7 @@ class Tournament:
             "Start date" : self.start_date,
             "End date": self.end_date,
             "Place": self.place,
-            "Rounds number": self.rounds_number,
+            "Number of rounds": self.number_of_rounds,
             "Players": self.players,
             "Actual round" : self.actual_round,
             "Rounds list" : self.rounds_list,
@@ -73,12 +72,12 @@ class Tournament:
             start_date = tournament.get("Start date", [])
             end_date = tournament.get("End date", [])
             place = tournament.get("Place", [])
-            rounds_number = tournament.get("Rounds number", [])
+            number_of_rounds = tournament.get("Number of rounds", [])
             players = tournament.get("Players", [])
             actual_round = tournament.get("Actual round", [])
             rounds_list = tournament.get("Rounds list", [])
             manager_comment = tournament.get("Manager comment", [])
-            tournament = [tournament_name, start_date, end_date, place, rounds_number, players, actual_round, rounds_list, manager_comment]
+            tournament = [tournament_name, start_date, end_date, place, number_of_rounds, players, actual_round, rounds_list, manager_comment]
             return tournament
         else :
             return None

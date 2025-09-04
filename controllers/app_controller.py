@@ -27,15 +27,15 @@ class AppController:
         manage tournaments, players, reports, or exit.
         """
         self.view.show_main_menu()
-        input_live = self.view.get_input("\nChoose an option : ")
+        user_choice = self.view.get_input("\nChoose an option : ")
 
-        if input_live == "1" or input_live == "1)":
+        if user_choice == "1" or user_choice == "1)":
             self.manage_tournaments()    
-        elif input_live == "2" or input_live == "2)":
+        elif user_choice == "2" or user_choice == "2)":
             self.manage_players()
-        elif input_live == "3" or input_live == "3)":
+        elif user_choice == "3" or user_choice == "3)":
             pass
-        elif input_live == "4" or input_live == "4)":
+        elif user_choice == "4" or user_choice == "4)":
             sys.exit()
         else :
             self.view.show_message("Erreur veuilez réessayer")
@@ -47,14 +47,14 @@ class AppController:
         for creating tournaments, adding players, playing tournaments, or go back.
         """
         self.view.show_tournaments_menu()
-        input_live = self.view.get_input("\nChoose an option : ")
-        while input_live == "1" or input_live == "1)": 
+        user_choice = self.view.get_input("\nChoose an option : ")
+        while user_choice == "1" or user_choice == "1)": 
             TournamentsController(self).create()
-        while input_live == "2" or input_live == "2)":
+        while user_choice == "2" or user_choice == "2)":
             TournamentsController(self).add_player_tournament()
-        while input_live == "3" or input_live == "3)":
+        while user_choice == "3" or user_choice == "3)":
             pass
-        while input_live == "4" or input_live == "4)":   
+        while user_choice == "4" or user_choice == "4)":   
             self.run()
 
     def manage_players(self):
@@ -64,14 +64,14 @@ class AppController:
         """
 
         self.view.show_manage_players_menu()
-        input_manageplayers = self.view.get_input("\nChoose an option : ")
-        while input_manageplayers == "1" or input_manageplayers == "1)":
+        user_choice = self.view.get_input("\nChoose an option : ")
+        while user_choice == "1" or user_choice == "1)":
             PlayersController(self).display_all_players()
             self.manage_players()
-        while input_manageplayers == "2" or input_manageplayers == "2)":
+        while user_choice == "2" or user_choice == "2)":
             PlayersController(self).add_player()
             self.manage_players()
-        while input_manageplayers == "3" or input_manageplayers == "3)":
+        while user_choice == "3" or user_choice == "3)":
             self.run()
 
 

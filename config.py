@@ -1,4 +1,4 @@
 """Configuration settings for the chess tournament application."""
 
-Data_Players_JSON = "data/players.json"
-Data_Tournaments_JSON = "data/tournaments.json"
+DATA_PLAYERS_PATH = "data/players.json"
+DATA_TOURNAMENTS_PATH = "data/tournaments.json"

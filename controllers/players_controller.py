@@ -7,7 +7,7 @@ class PlayersController:
     A controller class for managing player. 
     It provides methods to display all the players and adding new players to the database
     """
-    
+
     def __init__(self, parent):
         """
         Initialize a PlayersController instance.
@@ -30,14 +30,14 @@ class PlayersController:
         """
 
         self.view.show_message("\nEnter the new player details below :")
-        id = self.view.get_input("National chess ID : ")
-        current_player = Player.get_player_details(id)
+        national_chess_id = self.view.get_input("National chess ID : ")
+        current_player = Player.get_player_details(national_chess_id)
         if current_player :
             self.view.show_message("This player already exist")
         elif current_player == None :
             name = self.view.get_input("Name : ")
             surname = self.view.get_input("Surname : ")
             birthdate = self.view.get_input("Birthdate :")
-            self.view.show_message("\nPlayer successfully added !")
-            player = Player(id, name, surname, birthdate)
+            self.view.show_message(f"\n{name} {surname} ({national_chess_id}) was successfully added !")
+            player = Player(national_chess_id, name, surname, birthdate)
             player.save_json()

@@ -1,6 +1,6 @@
-from config import Data_Players_JSON
+from config import DATA_PLAYERS_PATH
 from tinydb import TinyDB, Query
-db_players = TinyDB(Data_Players_JSON)
+db_players = TinyDB(DATA_PLAYERS_PATH)
 
 class Player:
     """
@@ -9,18 +9,18 @@ class Player:
     database and retrieve player information.
     """
 
-    def __init__(self, id, name, surname, birthdate, score = 0.0):
+    def __init__(self, national_chess_id, name, surname, birthdate, score = 0.0):
         """
         Initialize a Player instance with the provided details.
 
         Args:
-            id : The National Chess ID of the player.
+            national_chess_id : The National Chess ID of the player.
             name : The player's first name.
             surname : The player's surname.
             birthdate : The player's birthdate.
             score : The player's score in a tournament.
         """
-        self.id = id #National chess ID  
+        self.national_chess_id = national_chess_id
         self.name = name   
         self.surname = surname
         self.birthdate = birthdate
@@ -32,7 +32,7 @@ class Player:
         """
         table = db_players.table("players")
         table.insert({
-            "National chess ID": self.id,
+            "National chess ID": self.national_chess_id,
             "Surname": self.surname,
             "Name": self.name,
             "Birthdate": self.birthdate,
@@ -54,12 +54,12 @@ class Player:
         return players_list
     
     @classmethod
-    def get_player_details(cls, id):
+    def get_player_details(cls, national_chess_id):
         """
         Return details of a player by their National Chess ID.
 
         Args:
-            id : The National Chess ID of the player to retrieve.
+            national_chess_id : The National Chess ID of the player to retrieve.
 
         Returns:
             list or None: A list containing the player's details or None.
@@ -67,7 +67,7 @@ class Player:
         table = db_players.table("players")
         current_player = None
         for player in table.all():
-            if player.get("National chess ID") == id:
+            if player.get("National chess ID") == national_chess_id:
                 current_player = player
                 break
 
@@ -75,12 +75,11 @@ class Player:
             name      = current_player["Name"]
             surname   = current_player["Surname"]
             birthdate = current_player["Birthdate"]
-            
-            current_player = [id, name, surname, birthdate]
-            return current_player  
+            current_player = [national_chess_id, name, surname, birthdate]
+            return current_player
         else:
             return None
 
     def __str__(self):
-        return self.surname, self.name, self.birthdate, self.id
+        return self.surname, self.name, self.birthdate, self.national_chess_id
     
