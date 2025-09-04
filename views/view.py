@@ -1,12 +1,12 @@
 from rich import print
 
-
 class View:    
     """
     A view class to display differents menu in the 
     application. 
     It displays menus, messages, and collects user input.
     """
+    
     def get_input(self, message):
         """
         Prompt the user for input and return the entered value.
@@ -29,7 +29,7 @@ class View:
         """
         print(message)
 
-    def main_menu(self):
+    def show_main_menu(self):
         """
         Display the main menu.
 
@@ -41,7 +41,7 @@ class View:
         print("3) Tournament reports")
         print("[red]4) Exit[/red]")
 
-    def manage_tournaments_menu(self):
+    def show_tournaments_menu(self):
         """
         Display the tournament management menu.
 
@@ -54,7 +54,7 @@ class View:
         print("3) Play a tournament")
         print("4)[red] Back [/red]")
 
-    def manage_players_menu(self):
+    def show_manage_players_menu(self):
         """
         Display the player management menu.
 
@@ -66,7 +66,7 @@ class View:
         print("2) Add players")
         print("[red]3) Back [/red]")
 
-    def add_players_tournament_menu(self):
+    def show_add_players_tournament_menu(self):
         """
         Display the menu for adding players to a tournament.
 

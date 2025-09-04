@@ -1,13 +1,13 @@
-from models import *
-from views import *
+from models import Player
+from views import View
 from rich import print
-
 
 class PlayersController: 
     """
     A controller class for managing player. 
     It provides methods to display all the players and adding new players to the database
     """
+    
     def __init__(self, parent):
         """
         Initialize a PlayersController instance.
@@ -18,11 +18,11 @@ class PlayersController:
         self.view = View()
         self.parent = parent
 
-    def players_list(self):
+    def display_all_players(self):
         """
         Display the list of all players using the method return_players of the Player model.
         """
-        self.view.show_message(Player.return_players())
+        self.view.show_message(Player.get_all_players())
 
     def add_player(self) :
         """ 
@@ -31,7 +31,7 @@ class PlayersController:
 
         self.view.show_message("\nEnter the new player details below :")
         id = self.view.get_input("National chess ID : ")
-        current_player = Player.return_player_details(id)
+        current_player = Player.get_player_details(id)
         if current_player :
             self.view.show_message("This player already exist")
         elif current_player == None :

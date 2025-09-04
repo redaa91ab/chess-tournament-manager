@@ -1,5 +1,5 @@
-from models import *
-from views import *
+from models import Tournament, Player
+from views import View
 from rich import print
 
 
@@ -8,6 +8,7 @@ class TournamentsController:
     A controller class for managing tournament.
     It provides methods to create a new tournament in tournaments.json and add new players to a tournament
     """
+    
     def __init__(self, parent):
         """
         Initialize a TournamentsController instance.
@@ -33,7 +34,6 @@ class TournamentsController:
         tournament.save_json()
         self.add_player_tournament(tournament_name)
 
-
     def add_player_tournament(self, tournament_name = None):
         """
         Add players to a tournament in tournaments.json
@@ -47,40 +47,38 @@ class TournamentsController:
         """
         while tournament_name == None :
             tournament_input = self.view.get_input("\nEnter the tournament name : ") 
-            if Tournament.tournament_details(tournament_input) == None :
+            if Tournament.get_tournament_details(tournament_input) == None :
                 self.view.show_message("We didn't find any match, please try again")
             else :
                 tournament_name = tournament_input
 
         self.view.show_message(f"[bold green]\n{tournament_name}[/bold green]")
-        self.view.add_players_tournament_menu()
+        self.view.show_add_players_tournament_menu()
         input_live = self.view.get_input("\nChoose an option : ")
+
         while input_live == "1" or input_live == "1)":
             self.view.show_message(f"\n[bold green]\n{tournament_name}[/bold green]\n")
             id = self.view.get_input("Add a player (National Chess ID) : ")
-            add_player = Player.return_player_details(id)
+            add_player = Player.get_player_details(id)
             if add_player == None :
                 self.view.show_message("\nThis player doesn't exist :\n1) Try again \n2) Create a new player \n")
                 option = self.view.get_input("Choose an option : ")
-                if option == "1" or option == "1)" :
+                if option == "1" or option == "1)":
                     pass
-
-                elif option == "2" or option == "2)" :
+                elif option == "2" or option == "2)":
                     name = self.view.get_input("Name : ")
                     surname = self.view.get_input("Surname : ")
                     birthdate = self.view.get_input("Birthdate : ")
                     Player(id, name, surname, birthdate).save_json()
-
                     Tournament.add_player(tournament_name, id)
                     self.view.show_message(f"\n{name} {surname} ({id}) was successfully added !")
-                    self.add_player_tournament(tournament_name)
-                       
+                    self.add_player_tournament(tournament_name)       
             else :
                 Tournament.add_player(tournament_name, id)
                 self.view.show_message(f"\n{add_player[1]} {add_player[2]} ({add_player[0]}) was successfully added !")
                 self.add_player_tournament(tournament_name)
 
-        while input_live == "2" or input_live == "2)" :
+        while input_live == "2" or input_live == "2)":
             self.parent.manage_tournaments()
 
 

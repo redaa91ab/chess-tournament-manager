@@ -1,8 +1,7 @@
-from models import *
-from views import *
-from rich import print
+from views import View
 from .players_controller import PlayersController
 from .tournaments_controller import TournamentsController
+from rich import print
 import sys
 
 class AppController:
@@ -10,7 +9,6 @@ class AppController:
     A controller class for managing the main application.
     It handles and display the main menu and delegates tasks to
     other controllers.
-
     """
 
     def __init__(self):
@@ -28,16 +26,16 @@ class AppController:
         Displays the main menu, collect user input, and directs the user to
         manage tournaments, players, reports, or exit.
         """
-        self.view.main_menu()
+        self.view.show_main_menu()
         input_live = self.view.get_input("\nChoose an option : ")
 
         if input_live == "1" or input_live == "1)":
             self.manage_tournaments()    
-        elif input_live == "2" or input_live == "2)" :
+        elif input_live == "2" or input_live == "2)":
             self.manage_players()
-        elif input_live == "3" or input_live == "3)" :
+        elif input_live == "3" or input_live == "3)":
             pass
-        elif input_live == "4" or input_live == "4)" :
+        elif input_live == "4" or input_live == "4)":
             sys.exit()
         else :
             self.view.show_message("Erreur veuilez réessayer")
@@ -48,7 +46,7 @@ class AppController:
         Display the tournament management menu, collect the user selection and delegates tasks to the TournamentsController
         for creating tournaments, adding players, playing tournaments, or go back.
         """
-        self.view.manage_tournaments_menu()
+        self.view.show_tournaments_menu()
         input_live = self.view.get_input("\nChoose an option : ")
         while input_live == "1" or input_live == "1)": 
             TournamentsController(self).create()
@@ -64,16 +62,16 @@ class AppController:
         Display the player management menu, collect the user selection and delegates tasks to the PlayersController for
         listing or adding players, or go back.
         """
-        
-        self.view.manage_players_menu()
+
+        self.view.show_manage_players_menu()
         input_manageplayers = self.view.get_input("\nChoose an option : ")
-        while input_manageplayers == "1" or input_manageplayers == "1)" :
-            PlayersController(self).players_list()
+        while input_manageplayers == "1" or input_manageplayers == "1)":
+            PlayersController(self).display_all_players()
             self.manage_players()
-        while input_manageplayers == "2" or input_manageplayers == "2)" :
+        while input_manageplayers == "2" or input_manageplayers == "2)":
             PlayersController(self).add_player()
             self.manage_players()
-        while input_manageplayers == "3" or input_manageplayers == "3)" :
+        while input_manageplayers == "3" or input_manageplayers == "3)":
             self.run()
 
 

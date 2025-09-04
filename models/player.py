@@ -1,5 +1,6 @@
+from config import Data_Players_JSON
 from tinydb import TinyDB, Query
-db_players = TinyDB('data/players.json')
+db_players = TinyDB(Data_Players_JSON)
 
 class Player:
     """
@@ -38,7 +39,7 @@ class Player:
         })
 
     @classmethod
-    def return_players(cls):
+    def get_all_players(cls):
         """
         Return a list of all players.
 
@@ -49,11 +50,11 @@ class Player:
         players_list = []
         for item in table.all():
             players_list.append(item)
-        
+
         return players_list
     
     @classmethod
-    def return_player_details(cls, id):
+    def get_player_details(cls, id):
         """
         Return details of a player by their National Chess ID.
 
@@ -63,7 +64,6 @@ class Player:
         Returns:
             list or None: A list containing the player's details or None.
         """
-
         table = db_players.table("players")
         current_player = None
         for player in table.all():
@@ -77,8 +77,7 @@ class Player:
             birthdate = current_player["Birthdate"]
             
             current_player = [id, name, surname, birthdate]
-            return current_player
-            
+            return current_player  
         else:
             return None
 

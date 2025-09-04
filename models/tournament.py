@@ -1,6 +1,7 @@
+from config import Data_Players_JSON, Data_Tournaments_JSON
 from tinydb import TinyDB, Query
-db_players = TinyDB('data/players.json')
-db_tournaments = TinyDB('data/tournaments.json')
+db_players = TinyDB(Data_Players_JSON)
+db_tournaments = TinyDB(Data_Tournaments_JSON)
 tournament_table = db_tournaments.table("tournaments")
 
 
@@ -26,7 +27,6 @@ class Tournament:
             players : A list of player IDs. Defaults to an empty list.
 
         """
-
         self.name = tournament_name
         self.place = place
         self.start_date = start_date
@@ -53,9 +53,8 @@ class Tournament:
             "Manager comment" : self.manager_comment
         }, (Query()['Tournament name'] == self.name))
 
-
     @classmethod
-    def tournament_details(cls, tournament_name):
+    def get_tournament_details(cls, tournament_name):
         """
         Retrieve details of a tournament by its name from the JSON database.
 
@@ -68,7 +67,6 @@ class Tournament:
         TournamentQuery = Query()
         tournaments = tournament_table.search(TournamentQuery["Tournament name"] == tournament_name)
 
-
         if tournaments:
             tournament = tournaments[0]
             tournament_name = tournament.get("Tournament name", [])
@@ -80,13 +78,10 @@ class Tournament:
             actual_round = tournament.get("Actual round", [])
             rounds_list = tournament.get("Rounds list", [])
             manager_comment = tournament.get("Manager comment", [])
-
             tournament = [tournament_name, start_date, end_date, place, rounds_number, players, actual_round, rounds_list, manager_comment]
-
             return tournament
         else :
             return None
-        
 
     @classmethod
     def add_player(cls, tournament_name, player):
@@ -99,7 +94,6 @@ class Tournament:
 
         Updates the tournament's player list in the database.
         """
-        
         TournamentQuery = Query()
         tournaments = tournament_table.search(TournamentQuery["Tournament name"] == tournament_name)
 
