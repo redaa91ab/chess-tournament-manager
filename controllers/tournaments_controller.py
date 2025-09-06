@@ -25,16 +25,17 @@ class TournamentsController:
         """
         self.view.show_message("\n[bold green]New tournament[/bold green]\n")
         self.view.show_message("Enter the new tournament details below : ")
-        tournament_name = self.view.get_input("Tournament name : ")
+        tournament_name = self.view.get_input("Tournament name : ").upper()
         place = self.view.get_input("Place : ")
         start_date = self.view.get_input("Start date (DD/MM/YYYY) : ")
         end_date = self.view.get_input("End date (DD/MM/YYYY): ")
         number_of_rounds = self.view.get_input("Number of rounds : ")
 
         try:
+            if Tournament.get_tournament_details(tournament_name) != None :
+                raise ValueError("This tournament name is already taken")
+            
             number_of_rounds = int(number_of_rounds)
-            if number_of_rounds <= 0:
-                raise ValueError("Number of rounds must be positive")
             from datetime import datetime
             datetime.strptime(start_date, "%d/%m/%Y")
             datetime.strptime(end_date, "%d/%m/%Y")
@@ -72,8 +73,8 @@ class TournamentsController:
         while user_choice == "1" or user_choice == "1)":
             self.view.show_message(f"\n[bold green]\n{tournament_name}[/bold green]\n")
             national_chess_id = self.view.get_input("Add a player (National Chess ID) : ")
-            add_player = Player.get_player_details(national_chess_id)
-            if add_player == None :
+            player = Player.get_player_details(national_chess_id)
+            if player == None :
                 self.view.show_message("\nThis player doesn't exist :\n1) Try again \n2) Create a new player \n")
                 user_choice_option = self.view.get_input("Choose an option : ")
                 if user_choice_option == "1" or user_choice_option == "1)":
@@ -81,14 +82,22 @@ class TournamentsController:
                 elif user_choice_option == "2" or user_choice_option == "2)":
                     name = self.view.get_input("Name : ")
                     surname = self.view.get_input("Surname : ")
-                    birthdate = self.view.get_input("Birthdate : ")
+                    while True : 
+                        birthdate = self.view.get_input("Birthdate : ")
+                        try:
+                            from datetime import datetime
+                            datetime.strptime(birthdate, "%d/%m/%Y")
+                            break
+                        except ValueError as e:
+                            self.view.show_message(f"Invalid input: {e}")
+                    
                     Player(national_chess_id, name, surname, birthdate).save_json()
                     Tournament.add_player(tournament_name, national_chess_id)
                     self.view.show_message(f"\n{name} {surname} ({national_chess_id}) was successfully added !")
                     self.add_player_tournament(tournament_name)
             else :
                 Tournament.add_player(tournament_name, national_chess_id)
-                self.view.show_message(f"\n{add_player[1]} {add_player[2]} ({add_player[0]}) was successfully added !")
+                self.view.show_message(f"\n{player["Name"]} {player["Surname"]} ({player["National chess ID"]}) was successfully added !")
                 self.add_player_tournament(tournament_name)
 
         while user_choice == "2" or user_choice == "2)":

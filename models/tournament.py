@@ -1,6 +1,5 @@
 from config import DATA_PLAYERS_PATH, DATA_TOURNAMENTS_PATH
 from tinydb import TinyDB, Query
-db_players = TinyDB(DATA_PLAYERS_PATH)
 db_tournaments = TinyDB(DATA_TOURNAMENTS_PATH)
 tournament_table = db_tournaments.table("tournaments")
 
@@ -63,23 +62,23 @@ class Tournament:
         Returns:
             list or None: A list containing the tournament's details or None.
         """
+        
         TournamentQuery = Query()
-        tournaments = tournament_table.search(TournamentQuery["Tournament name"] == tournament_name)
+        tournament = tournament_table.get(TournamentQuery["Tournament name"] == tournament_name)
 
-        if tournaments:
-            tournament = tournaments[0]
-            tournament_name = tournament.get("Tournament name", [])
-            start_date = tournament.get("Start date", [])
-            end_date = tournament.get("End date", [])
-            place = tournament.get("Place", [])
-            number_of_rounds = tournament.get("Number of rounds", [])
-            players = tournament.get("Players", [])
-            actual_round = tournament.get("Actual round", [])
-            rounds_list = tournament.get("Rounds list", [])
-            manager_comment = tournament.get("Manager comment", [])
-            tournament = [tournament_name, start_date, end_date, place, number_of_rounds, players, actual_round, rounds_list, manager_comment]
-            return tournament
-        else :
+        if tournament:
+            return {
+                "Tournament name": tournament["Tournament name"],
+                "Start date": tournament["Start date"],
+                "End date": tournament["End date"],
+                "Place": tournament["Place"],
+                "Number of rounds": tournament["Number of rounds"],
+                "Players": tournament["Players"],
+                "Actual round": tournament["Actual round"],
+                "Rounds list": tournament["Rounds list"],
+                "Manager comment": tournament["Manager comment"]
+                }
+        else:
             return None
 
     @classmethod

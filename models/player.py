@@ -1,6 +1,7 @@
 from config import DATA_PLAYERS_PATH
 from tinydb import TinyDB, Query
 db_players = TinyDB(DATA_PLAYERS_PATH)
+players_table = db_players.table("players")
 
 class Player:
     """
@@ -30,8 +31,7 @@ class Player:
         """
         Save the player's details to the players JSON database using TinyDB.
         """
-        table = db_players.table("players")
-        table.insert({
+        players_table.insert({
             "National chess ID": self.national_chess_id,
             "Surname": self.surname,
             "Name": self.name,
@@ -46,9 +46,8 @@ class Player:
         Returns:
             list: A list of dictionaries containing the details of each player.
         """
-        table = db_players.table("players")
         players_list = []
-        for item in table.all():
+        for item in players_table.all():
             players_list.append(item)
 
         return players_list
@@ -64,19 +63,16 @@ class Player:
         Returns:
             list or None: A list containing the player's details or None.
         """
-        table = db_players.table("players")
-        current_player = None
-        for player in table.all():
-            if player.get("National chess ID") == national_chess_id:
-                current_player = player
-                break
+        PlayerQuery = Query()
+        player = players_table.get(PlayerQuery["National chess ID"] == national_chess_id)
 
-        if current_player:
-            name      = current_player["Name"]
-            surname   = current_player["Surname"]
-            birthdate = current_player["Birthdate"]
-            current_player = [national_chess_id, name, surname, birthdate]
-            return current_player
+        if player:
+            return {
+                "National chess ID" : player["National chess ID"],
+                "Name" : player["Name"],
+                "Surname" : player["Surname"],
+                "Birthdate" : player["Birthdate"]
+            }
         else:
             return None
 
