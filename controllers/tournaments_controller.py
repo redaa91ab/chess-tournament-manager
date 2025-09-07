@@ -103,5 +103,16 @@ class TournamentsController:
         while user_choice == "2" or user_choice == "2)":
             self.parent.manage_tournaments()
 
+    
+    def generate_round(self, tournament_name):
+        tournament = Tournament.get_tournament_details(tournament_name)
+        players = tournament["Players"]
+        players.sort(key=lambda x: x[1])
+        rounds_list = tournament["Rounds list"]
+        
+
+
+
+
 
 

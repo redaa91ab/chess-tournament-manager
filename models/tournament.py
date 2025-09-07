@@ -12,7 +12,7 @@ class Tournament:
     retrieve or update tournament information.
     """
 
-    def __init__(self, tournament_name, place, start_date, end_date, number_of_rounds = 3, players = []):
+    def __init__(self, tournament_name, place, start_date, end_date, number_of_rounds = 4, players = []):
         """
         Initialize a Tournament instance with the provided details.
 
@@ -21,7 +21,7 @@ class Tournament:
             place : The location of the tournament.
             start_date : The start date of the tournament.
             end_date : The end date of the tournament.
-            number_of_rounds : The number of rounds in the tournament. Defaults to 3.
+            number_of_rounds : The number of rounds in the tournament. Defaults to 4.
             players : A list of player National Chess IDs. Defaults to an empty list.
 
         """
@@ -98,7 +98,7 @@ class Tournament:
         if tournaments:
             tournament = tournaments[0]
             players = tournament.get("Players", [])
-            players.append(player)
+            players.append([player, 0.0])
             tournament_table.update({"Players": players}, TournamentQuery["Tournament name"] == tournament_name)
 
 
