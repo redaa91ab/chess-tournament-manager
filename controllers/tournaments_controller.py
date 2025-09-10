@@ -108,8 +108,42 @@ class TournamentsController:
         tournament = Tournament.get_tournament_details(tournament_name)
         players = tournament["Players"]
         players.sort(key=lambda x: x[1])
-        rounds_list = tournament["Rounds list"]
         
+        rounds_list = tournament["Rounds list"]
+        def have_played_before(p1, p2, past_rounds):
+            p1 = p1[0]
+            p2 = p2[0]
+            for rnd in past_rounds:
+                for match in rnd:
+                    if (p1 == match[0][0] and p2 == match[1][0]) or (p1 == match[1][0] and p2 == match[0][0]):
+                        return True
+            return False
+        players = tournament["Players"]
+        players.sort(key=lambda x: x[1])  # tri par score croissant
+        
+        new_round = [] # liste des matchs du round
+        used_players = []
+
+        for player in players:
+            if player in used_players:
+                continue  # ce joueur est déjà apparié
+
+            # chercher un adversaire
+            for opponent in players:
+                if opponent in used_players or opponent == player:
+                    continue
+
+                if have_played_before(player, opponent, tournament["Rounds list"]):
+                    continue
+                
+                else :
+                    new_round.append((player, opponent))
+                    used_players.append(player)
+                    used_players.append(opponent)
+                    break # on passe au joueur suivant
+
+        return new_round
+    
 
 
 
