@@ -103,14 +103,27 @@ class TournamentsController:
         while user_choice == "2" or user_choice == "2)":
             self.parent.manage_tournaments()
 
+
     
-    def generate_round(self, tournament_name):
-        tournament = Tournament.get_tournament_details(tournament_name)
-        players = tournament["Players"]
-        players.sort(key=lambda x: x[1])
+    def generate_round(tournament):
+        """
+        return a list new round for the tournament, based on actual players, score, and past rounds.
+
+        Args :
+            tournament : The tournament where to generate
         
-        rounds_list = tournament["Rounds list"]
+        """
+        
         def have_played_before(p1, p2, past_rounds):
+            """
+            return True if the two players have played in the past rounds on this tournament
+            else return False 
+
+            Args : 
+                p1 and p2 : The two players
+                past_rounds : The past rounds of the tournament
+        
+            """
             p1 = p1[0]
             p2 = p2[0]
             for rnd in past_rounds:
@@ -118,8 +131,10 @@ class TournamentsController:
                     if (p1 == match[0][0] and p2 == match[1][0]) or (p1 == match[1][0] and p2 == match[0][0]):
                         return True
             return False
+            
+        tournament = Tournament.get_tournament_details(tournament)
         players = tournament["Players"]
-        players.sort(key=lambda x: x[1])  # tri par score croissant
+        players.sort(key=lambda x: x[1])
         
         new_round = [] # liste des matchs du round
         used_players = []
@@ -138,12 +153,16 @@ class TournamentsController:
                 
                 else :
                     new_round.append((player, opponent))
-                    used_players.append(player)
-                    used_players.append(opponent)
+                    used_players.extend([player, opponent])
                     break # on passe au joueur suivant
 
-        return new_round
-    
+            if player not in used_players :
+                for opponent in players:
+                    if opponent not in used_players and opponent != player:
+                        new_round.append((player, opponent))
+                        used_players.extend([player, opponent])
+                        break
+        return new_round    
 
 
 
