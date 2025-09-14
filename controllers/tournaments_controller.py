@@ -162,7 +162,18 @@ class TournamentsController:
                         new_round.append((player, opponent))
                         used_players.extend([player, opponent])
                         break
-        return new_round    
+        return new_round
+    
+    def play_tournament(tournament):
+        rounds_list = tournament["Rounds list"]
+        def is_round_finished(actual_round, players):
+            for game in actual_round :
+                for player in game :
+                    if player != players[player][] :
+                        return False
+        
+        return is_round_finished(rounds_list[1], rounds_list[2])
+    
 
 
 
