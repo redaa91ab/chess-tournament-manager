@@ -104,31 +104,25 @@ class TournamentsController:
             self.parent.manage_tournaments()
 
     def play_tournament(tournament):
-        """
-        Manage tha Play Tournament Menu
-        If a round is not updated, ask the user to update it
-        Else create a new round
-        """
         rounds_list = tournament["Rounds list"]
-        last_round = rounds_list[len(rounds_list)-1]
         players = tournament["Players"]
-        
-        def is_round_finished(last_round, players):
-            """
-            Compare the score of each player in the last round, and in the tournament list "players".
-            If at least one score is different, that means that the round was updated so the round is finish. Return True
-            Else return False
-            """
-            for game in last_round :
-                for player_game in game :
-                    for player_players in players :
-                        if player_game[0] == player_players[0] :
-                            if player_game[1] != player_players[1] :
-                                return True
-            return False
+        def is_round_finished(rounds_list, players):
             
-        return is_round_finished(last_round, players)
-
+            if len(rounds_list) < 1 :
+                return True
+            else :
+                last_round = rounds_list[len(rounds_list)-1]
+                for game in last_round :
+                    for player_game in game :
+                        for player_players in players :
+                            
+                            if player_game[0] == player_players[0] :
+                                if player_game[1] != player_players[1] :
+                                    return True
+                return False
+            
+        return is_round_finished(rounds_list, players)
+    
 
     def generate_round(tournament):
         """
