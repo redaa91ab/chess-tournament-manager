@@ -103,7 +103,17 @@ class TournamentsController:
         while user_choice == "2" or user_choice == "2)":
             self.parent.manage_tournaments()
 
-    def play_tournament(tournament):
+    def play_tournament(self, tournament_name = None):
+        
+
+        while tournament_name == None :
+            self.view.show_message("\n[bold green]Play tournament[/bold green]\n")
+            self.view.show_message("Enter the tournament name below :")
+            user_input = self.view.get_input("Tournament name : ").upper()
+            if Tournament.get_tournament_details(user_input) != None :
+                tournament = Tournament.get_tournament_details(user_input)
+                break
+
         rounds_list = tournament["Rounds list"]
         players = tournament["Players"]
         def is_round_finished(rounds_list, players):
@@ -121,10 +131,23 @@ class TournamentsController:
                                     return True
                 return False
             
-        return is_round_finished(rounds_list, players)
+        self.view.show_play_tournament_menu()
+        user_input = self.view.get_input("\nChoose an option : ")
+        while user_input == "1" or user_input == "1)" :
+            if is_round_finished(rounds_list, players) == True :
+                new_round = self.generate_round(tournament)
+                self.view.show_message(new_round)
+                self.play_tournament(tournament_name)
+        
+            else :
+                self.view.show_message("Please update the last round before to create a new one")
+                self.play_tournament(tournament_name)
     
 
-    def generate_round(tournament):
+
+    
+
+    def generate_round(self, tournament):
         """
         return a list new round for the tournament, based on actual players, score, and past rounds.
 
@@ -151,7 +174,6 @@ class TournamentsController:
                         return True
             return False
             
-        tournament = Tournament.get_tournament_details(tournament)
         players = tournament["Players"]
         players.sort(key=lambda x: x[1])
         
@@ -181,6 +203,7 @@ class TournamentsController:
                         new_round.append((player, opponent))
                         used_players.extend([player, opponent])
                         break
+
         return new_round
     
 

@@ -81,9 +81,11 @@ class View:
 
         Show options
         """
-        print("1) Continue ")
+        print("[bold green]\nPlay Tournament[/bold green]")
+        print("\n1) Create a new round ")
+        print("2) Update the actual round")
         print("2) Finish the tournament")
-        print("3) [red] Back[/red]")
+        print("3)[red] Back[/red]")
 
 
 

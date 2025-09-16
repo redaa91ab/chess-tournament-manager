@@ -53,7 +53,7 @@ class AppController:
         while user_choice == "2" or user_choice == "2)":
             TournamentsController(self.view, self).add_player_tournament()
         while user_choice == "3" or user_choice == "3)":
-            pass
+            TournamentsController(self.view, self).play_tournament()
         while user_choice == "4" or user_choice == "4)":   
             self.run()
 
