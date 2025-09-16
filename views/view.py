@@ -75,5 +75,15 @@ class View:
         print("\n1) Add new players")
         print("2)[red] Back[/red]")
 
+    def show_play_tournament_menu(self):
+        """
+        Display the play tournament menu
+
+        Show options
+        """
+        print("1) Continue ")
+        print("2) Finish the tournament")
+        print("3) [red] Back[/red]")
+
 
 
