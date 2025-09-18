@@ -12,7 +12,7 @@ class Tournament:
     retrieve or update tournament information.
     """
 
-    def __init__(self, tournament_name, place, start_date, end_date, number_of_rounds = 4, players = []):
+    def __init__(self, tournament_name, place, start_date, end_date, number_of_rounds = 4, players = [], rounds_list = []):
         """
         Initialize a Tournament instance with the provided details.
 
@@ -32,8 +32,9 @@ class Tournament:
         self.number_of_rounds = number_of_rounds
         self.players = players
         self.actual_round = 1
-        self.rounds_list = []
+        self.rounds_list = rounds_list
         self.manager_comment = None
+
 
     def save_json(self):
         """
@@ -101,6 +102,19 @@ class Tournament:
             players.append([player, 0.0])
             tournament_table.update({"Players": players}, TournamentQuery["Tournament name"] == tournament_name)
 
+    
+    @classmethod
+    def add_round(cls, tournament_name, round):
+        """ Update the rounds_list of the tournament by adding the round (list of games) to the list
+        """
+        TournamentQuery = Query()
+        tournaments = tournament_table.search(TournamentQuery["Tournament name"] == tournament_name)
+
+        if tournaments:
+            tournament = tournaments[0]
+            rounds_list = tournament.get("Rounds list", [])
+            rounds_list.append([round])
+            tournament_table.update({"Rounds list": round}, TournamentQuery["Tournament name"] == tournament_name)
 
     
 

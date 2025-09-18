@@ -103,10 +103,14 @@ class TournamentsController:
         while user_choice == "2" or user_choice == "2)":
             self.parent.manage_tournaments()
 
-    def play_tournament(self, tournament_name = None):
-        
+    def play_tournament(self, tournament = None):
+        """
+        Collect the details of the tournament
+        Check if a round is actually playing
+        Show options for the tournament among : creating a new round, updating an actual round, finishing the tournament or going back
+        """
 
-        while tournament_name == None :
+        while tournament == None :
             self.view.show_message("\n[bold green]Play tournament[/bold green]\n")
             self.view.show_message("Enter the tournament name below :")
             user_input = self.view.get_input("Tournament name : ").upper()
@@ -137,14 +141,10 @@ class TournamentsController:
             if is_round_finished(rounds_list, players) == True :
                 new_round = self.generate_round(tournament)
                 self.view.show_message(new_round)
-                self.play_tournament(tournament_name)
-        
+                self.play_tournament(tournament)
             else :
                 self.view.show_message("Please update the last round before to create a new one")
-                self.play_tournament(tournament_name)
-    
-
-
+                self.play_tournament(tournament)
     
 
     def generate_round(self, tournament):
@@ -204,6 +204,7 @@ class TournamentsController:
                         used_players.extend([player, opponent])
                         break
 
+        Tournament.add_round(tournament["Tournament name"], new_round)
         return new_round
     
 
