@@ -87,5 +87,11 @@ class View:
         print("3) Finish the tournament")
         print("4)[red] Back[/red]")
 
+    def show_tournaments_list(self, tournaments):
+        print("[bold green]\nAll tournaments\n[/bold green]")
+        for tournament in tournaments:
+            tournament_id = tournament
+            tournament_name = tournaments[tournament_id]["Tournament name"]
+            print(f"{tournament_id}) {tournament_name}")
 
 

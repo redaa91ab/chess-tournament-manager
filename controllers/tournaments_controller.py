@@ -23,7 +23,7 @@ class TournamentsController:
         """
         Collect new tournament details and save it in tournaments.json by using the methods save_json of the model Tournament
         """
-        self.view.show_message("\n[bold green]New tournament[/bold green]\n")
+        self.view.show_message("\n[bold green]Create tournament[/bold green]\n")
         self.view.show_message("Enter the new tournament details below : ")
         tournament_name = self.view.get_input("Tournament name : ").upper()
         place = self.view.get_input("Place : ")
@@ -45,9 +45,8 @@ class TournamentsController:
 
         tournament = Tournament(tournament_name, place, start_date, end_date, number_of_rounds)
         tournament.save_json()
-        self.add_player_tournament(tournament.tournament_name)
 
-    def add_player_tournament(self, tournament_name = None):
+    def add_player_tournament(self, tournament_id = None):
         """
         Add players to a tournament in tournaments.json
 
@@ -58,14 +57,19 @@ class TournamentsController:
         Collect the tournament name if not provided and add player to the tournament in tournaments.json.
         If a player doesn't exist, offers the option to create a new player or try again.
         """
-        while tournament_name == None :
-            user_input = self.view.get_input("\nEnter the tournament name : ")
-            user_input = user_input.upper() 
-            if Tournament.get_tournament_details(user_input) == None :
-                self.view.show_message("We didn't find any match, please try again")
-            else :
-                tournament_name = user_input
 
+        tournaments = Tournament.get_all_tournaments()
+  
+        while tournament_id == None :
+            self.view.show_tournaments_list(tournaments)
+            user_input = self.view.get_input("\nEnter the tournament id : ") 
+            if int(user_input) in tournaments :
+                tournament_id = int(user_input)
+            else :
+                self.view.show_message("We didn't find any match, please try again")
+
+        tournament_details = tournaments[tournament_id]
+        tournament_name = tournament_details["Tournament name"]
         self.view.show_message(f"[bold green]\n{tournament_name}[/bold green]")
         self.view.show_add_players_tournament_menu()
         user_choice = self.view.get_input("\nChoose an option : ")
@@ -73,7 +77,7 @@ class TournamentsController:
         while user_choice == "1" or user_choice == "1)":
             self.view.show_message(f"\n[bold green]\n{tournament_name}[/bold green]\n")
             national_chess_id = self.view.get_input("Add a player (National Chess ID) : ")
-            player = Player.get_player_details(national_chess_id)
+            player = Player.get_player_details(national_chess_id) #temporaire changer en faisant if player in players (plus comprehensible)
             if player == None :
                 self.view.show_message("\nThis player doesn't exist :\n1) Try again \n2) Create a new player \n")
                 user_choice_option = self.view.get_input("Choose an option : ")
@@ -92,13 +96,13 @@ class TournamentsController:
                             self.view.show_message(f"Invalid input: {e}")
                     
                     Player(national_chess_id, name, surname, birthdate).save_json()
-                    Tournament.add_player(tournament_name, national_chess_id)
+                    Tournament.add_player(tournament_id, national_chess_id)
                     self.view.show_message(f"\n{name} {surname} ({national_chess_id}) was successfully added !")
-                    self.add_player_tournament(tournament_name)
+                    self.add_player_tournament(tournament_id) #changer afin de ne pas surempiler
             else :
-                Tournament.add_player(tournament_name, national_chess_id)
+                Tournament.add_player(tournament_id, national_chess_id)
                 self.view.show_message(f"\n{player["Name"]} {player["Surname"]} ({player["National chess ID"]}) was successfully added !")
-                self.add_player_tournament(tournament_name)
+                self.add_player_tournament(tournament_id)
 
         while user_choice == "2" or user_choice == "2)":
             self.parent.manage_tournaments()
