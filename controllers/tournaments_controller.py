@@ -68,64 +68,58 @@ class TournamentsController:
             else :
                 self.view.show_message("We didn't find any match, please try again")
 
-        tournament_details = tournaments[tournament_id]
-        tournament_name = tournament_details["Tournament name"]
-        self.view.show_message(f"[bold green]\n{tournament_name}[/bold green]")
-        self.view.show_add_players_tournament_menu()
-        user_choice = self.view.get_input("\nChoose an option : ")
+        while True :
+            tournament_details = tournaments[tournament_id]
+            tournament_name = tournament_details["Tournament name"]
+            self.view.show_message(f"[bold green]\n{tournament_name}[/bold green]")
+            self.view.show_add_players_tournament_menu()
+            user_choice = self.view.get_input("\nChoose an option : ")
 
-        while user_choice == "1" or user_choice == "1)":
-            self.view.show_message(f"\n[bold green]\n{tournament_name}[/bold green]\n")
-            national_chess_id = self.view.get_input("Add a player (National Chess ID) : ")
-            player = Player.get_player_details(national_chess_id) #temporaire changer en faisant if player in players (plus comprehensible)
-            if player == None :
-                self.view.show_message("\nThis player doesn't exist :\n1) Try again \n2) Create a new player \n")
-                user_choice_option = self.view.get_input("Choose an option : ")
-                if user_choice_option == "1" or user_choice_option == "1)":
-                    pass
-                elif user_choice_option == "2" or user_choice_option == "2)":
-                    name = self.view.get_input("Name : ")
-                    surname = self.view.get_input("Surname : ")
-                    while True : 
-                        birthdate = self.view.get_input("Birthdate : ")
-                        try:
-                            from datetime import datetime
-                            datetime.strptime(birthdate, "%d/%m/%Y")
-                            break
-                        except ValueError as e:
-                            self.view.show_message(f"Invalid input: {e}")
-                    
-                    Player(national_chess_id, name, surname, birthdate).save_json()
+            if user_choice == "1" or user_choice == "1)":
+                self.view.show_message(f"\n[bold green]\n{tournament_name}[/bold green]\n")
+                national_chess_id = self.view.get_input("Add a player (National Chess ID) : ")
+                player = Player.get_player_details(national_chess_id)
+                if player in Player.get_all_players():
                     Tournament.add_player(tournament_id, national_chess_id)
-                    self.view.show_message(f"\n{name} {surname} ({national_chess_id}) was successfully added !")
-                    self.add_player_tournament(tournament_id) #changer afin de ne pas surempiler
-            else :
-                Tournament.add_player(tournament_id, national_chess_id)
-                self.view.show_message(f"\n{player["Name"]} {player["Surname"]} ({player["National chess ID"]}) was successfully added !")
-                self.add_player_tournament(tournament_id)
-
-        while user_choice == "2" or user_choice == "2)":
-            self.parent.manage_tournaments()
-
-    def play_tournament(self, tournament = None):
-        """
-        Collect the details of the tournament
-        Check if a round is actually playing
-        Show options for the tournament among : creating a new round, updating an actual round, finishing the tournament or going back
-        """
-
-        while tournament == None :
-            self.view.show_message("\n[bold green]Play tournament[/bold green]\n")
-            self.view.show_message("Enter the tournament name below :")
-            user_input = self.view.get_input("Tournament name : ").upper()
-            if Tournament.get_tournament_details(user_input) != None :
-                tournament = Tournament.get_tournament_details(user_input)
+                    self.view.show_message(f"\n{player["Name"]} {player["Surname"]} ({player["National chess ID"]}) was successfully added !")
+                elif player not in Player.get_all_players() or player == None:
+                    self.view.show_message("\nThis player doesn't exist :\n1) Try again \n2) Create a new player \n")
+                    user_choice_option = self.view.get_input("Choose an option : ")
+                    if user_choice_option == "1" or user_choice_option == "1)":
+                        pass
+                    elif user_choice_option == "2" or user_choice_option == "2)":
+                        name = self.view.get_input("Name : ")
+                        surname = self.view.get_input("Surname : ")
+                        while True : 
+                            birthdate = self.view.get_input("Birthdate : ")
+                            try:
+                                from datetime import datetime
+                                datetime.strptime(birthdate, "%d/%m/%Y")
+                                break
+                            except ValueError as e:
+                                self.view.show_message(f"Invalid input: {e}")
+                        
+                        Player(national_chess_id, name, surname, birthdate).save_json()
+                        Tournament.add_player(tournament_id, national_chess_id)
+                        self.view.show_message(f"\n{name} {surname} ({national_chess_id}) was successfully added !")
+                
+            elif user_choice == "2" or user_choice == "2)":
                 break
 
-        rounds_list = tournament["Rounds list"]
-        players = tournament["Players"]
+    def play_tournament(self, tournament_id = None):
+        
+        tournaments = Tournament.get_all_tournaments()
+
+        while tournament_id == None :
+            self.view.show_message("\n[bold green]Play tournament[/bold green]\n")
+            self.view.show_tournaments_list(tournaments)
+            user_input = self.view.get_input("Enter the tournament id : ")
+            if int(user_input) in tournaments :
+                tournament_id = int(user_input)
+            else :
+                self.view.show_message("We didn't find any match, please try again")
+
         def is_round_finished(rounds_list, players):
-            
             if len(rounds_list) < 1 :
                 return True
             else :
@@ -138,18 +132,23 @@ class TournamentsController:
                                 if player_game[1] != player_players[1] :
                                     return True
                 return False
-            
-        self.view.show_play_tournament_menu()
-        user_input = self.view.get_input("\nChoose an option : ")
-        while user_input == "1" or user_input == "1)" :
-            if is_round_finished(rounds_list, players) == True :
-                new_round = self.generate_round(tournament)
-                self.view.show_message(new_round)
-                self.play_tournament(tournament)
-            else :
-                self.view.show_message("Please update the last round before to create a new one")
-                self.play_tournament(tournament)
-    
+
+        while True :
+            tournaments = Tournament.get_all_tournaments()
+            tournament_details = tournaments[tournament_id]
+            rounds_list = tournament_details["Rounds list"]
+            players = tournament_details["Players"]
+            self.view.show_play_tournament_menu()
+            user_input = self.view.get_input("\nChoose an option : ")
+            if user_input == "1" or user_input == "1)" :
+                if is_round_finished(rounds_list, players) == True :
+                    new_round = self.generate_round(tournament_details)
+                    self.view.show_message(new_round)
+                else :
+                    self.view.show_message("Please update the last round before to create a new one")
+            if user_input == "4" or user_input == "4)" :
+                break
+        
 
     def generate_round(self, tournament):
         """

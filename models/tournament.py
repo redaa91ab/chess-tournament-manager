@@ -126,7 +126,7 @@ class Tournament:
         if tournaments:
             tournament = tournaments[0]
             rounds_list = tournament.get("Rounds list", [])
-            rounds_list.append([round])
-            tournament_table.update({"Rounds list": round}, TournamentQuery["Tournament name"] == tournament_name)
+            rounds_list.append(round)
+            tournament_table.update({"Rounds list": rounds_list}, TournamentQuery["Tournament name"] == tournament_name)
 
     
