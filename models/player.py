@@ -32,10 +32,10 @@ class Player:
         Save the player's details to the players JSON database using TinyDB.
         """
         players_table.insert({
-            "National chess ID": self.national_chess_id,
-            "Surname": self.surname,
-            "Name": self.name,
-            "Birthdate": self.birthdate,
+            "national_chess_id": self.national_chess_id,
+            "surname": self.surname,
+            "name": self.name,
+            "birthdate": self.birthdate,
         })
 
     @classmethod
@@ -64,14 +64,14 @@ class Player:
             list or None: A list containing the player's details or None.
         """
         PlayerQuery = Query()
-        player = players_table.get(PlayerQuery["National chess ID"] == national_chess_id)
+        player = players_table.get(PlayerQuery["national_chess_id"] == national_chess_id)
 
         if player:
             return {
-                "National chess ID" : player["National chess ID"],
-                "Name" : player["Name"],
-                "Surname" : player["Surname"],
-                "Birthdate" : player["Birthdate"]
+                "national_chess_id" : player["national_chess_id"],
+                "name" : player["name"],
+                "surname" : player["surname"],
+                "birthdate" : player["birthdate"]
             }
         else:
             return None

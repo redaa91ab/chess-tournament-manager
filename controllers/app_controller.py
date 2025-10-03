@@ -55,7 +55,7 @@ class AppController:
         while True :
             self.view.show_tournaments_menu()
             user_choice = self.view.get_input("\nChoose an option : ")
-            if user_choice == "1" or user_choice == "1)": 
+            if user_choice == "1" or user_choice == "1)":
                 self.tournament.create()
             elif user_choice == "2" or user_choice == "2)":
                 self.tournament.add_player_tournament()

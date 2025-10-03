@@ -91,7 +91,7 @@ class View:
         print("[bold green]\nAll tournaments\n[/bold green]")
         for tournament in tournaments:
             tournament_id = tournament
-            tournament_name = tournaments[tournament_id]["Tournament name"]
+            tournament_name = tournaments[tournament_id]["tournament_name"]
             print(f"{tournament_id}) {tournament_name}")
 
 

@@ -1,5 +1,7 @@
 from models import Tournament, Player
 from rich import print
+from datetime import datetime
+
 
 
 class TournamentsController:
@@ -36,7 +38,6 @@ class TournamentsController:
                 raise ValueError("This tournament name is already taken")
             
             number_of_rounds = int(number_of_rounds)
-            from datetime import datetime
             datetime.strptime(start_date, "%d/%m/%Y")
             datetime.strptime(end_date, "%d/%m/%Y")
         except ValueError as e:
@@ -70,7 +71,7 @@ class TournamentsController:
 
         while True :
             tournament_details = tournaments[tournament_id]
-            tournament_name = tournament_details["Tournament name"]
+            tournament_name = tournament_details["tournament_name"]
             self.view.show_message(f"[bold green]\n{tournament_name}[/bold green]")
             self.view.show_add_players_tournament_menu()
             user_choice = self.view.get_input("\nChoose an option : ")
@@ -81,7 +82,7 @@ class TournamentsController:
                 player = Player.get_player_details(national_chess_id)
                 if player in Player.get_all_players():
                     Tournament.add_player(tournament_id, national_chess_id)
-                    self.view.show_message(f"\n{player["Name"]} {player["Surname"]} ({player["National chess ID"]}) was successfully added !")
+                    self.view.show_message(f"\n{player["name"]} {player["surname"]} ({player["national_chess_id"]}) was successfully added !")
                 elif player not in Player.get_all_players() or player == None:
                     self.view.show_message("\nThis player doesn't exist :\n1) Try again \n2) Create a new player \n")
                     user_choice_option = self.view.get_input("Choose an option : ")
@@ -113,7 +114,7 @@ class TournamentsController:
         while tournament_id == None :
             self.view.show_message("\n[bold green]Play tournament[/bold green]\n")
             self.view.show_tournaments_list(tournaments)
-            user_input = self.view.get_input("Enter the tournament id : ")
+            user_input = self.view.get_input("Select a tournament: ")
             if int(user_input) in tournaments :
                 tournament_id = int(user_input)
             else :
@@ -136,10 +137,10 @@ class TournamentsController:
         while True :
             tournaments = Tournament.get_all_tournaments()
             tournament_details = tournaments[tournament_id]
-            rounds_list = tournament_details["Rounds list"]
-            players = tournament_details["Players"]
+            rounds_list = tournament_details["rounds_list"]
+            players = tournament_details["players"]
             self.view.show_play_tournament_menu()
-            user_input = self.view.get_input("\nChoose an option : ")
+            user_input = self.view.get_input("\nSelect an option : ")
             if user_input == "1" or user_input == "1)" :
                 if is_round_finished(rounds_list, players) == True :
                     new_round = self.generate_round(tournament_details)
@@ -177,7 +178,7 @@ class TournamentsController:
                         return True
             return False
             
-        players = tournament["Players"]
+        players = tournament["players"]
         players.sort(key=lambda x: x[1])
         
         new_round = [] # liste des matchs du round
@@ -192,7 +193,7 @@ class TournamentsController:
                 if opponent in used_players or opponent == player:
                     continue
 
-                if have_played_before(player, opponent, tournament["Rounds list"]):
+                if have_played_before(player, opponent, tournament["rounds_list"]):
                     continue
                 
                 else :
@@ -207,7 +208,7 @@ class TournamentsController:
                         used_players.extend([player, opponent])
                         break
 
-        Tournament.add_round(tournament["Tournament name"], new_round)
+        Tournament.add_round(tournament["tournament_name"], new_round)
         return new_round
     
 

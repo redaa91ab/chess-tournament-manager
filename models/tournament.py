@@ -32,7 +32,7 @@ class Tournament:
         self.number_of_rounds = number_of_rounds
         self.players = []
         self.rounds_list = []
-        self.actual_round = 1
+        self.current_round = 1
         self.manager_comment = None
 
 
@@ -50,16 +50,16 @@ class Tournament:
         Save the tournament's details to the tournaments JSON database.
         """
         tournament_table.upsert({
-            "Tournament name": self.tournament_name,
-            "Start date" : self.start_date,
-            "End date": self.end_date,
-            "Place": self.place,
-            "Number of rounds": self.number_of_rounds,
-            "Players": self.players,
-            "Actual round" : self.actual_round,
-            "Rounds list" : self.rounds_list,
-            "Manager comment" : self.manager_comment
-        }, (Query()['Tournament name'] == self.tournament_name))
+            "tournament_name": self.tournament_name,
+            "start_date" : self.start_date,
+            "end_date": self.end_date,
+            "place": self.place,
+            "number_of_rounds": self.number_of_rounds,
+            "players": self.players,
+            "current_round" : self.current_round,
+            "rounds_list" : self.rounds_list,
+            "manager_comment" : self.manager_comment
+        }, (Query()['tournament_name'] == self.tournament_name))
 
     @classmethod
     def get_tournament_details(cls, tournament_name):
@@ -78,25 +78,18 @@ class Tournament:
 
         if tournament:
             return {
-                "Tournament name": tournament["Tournament name"],
-                "Start date": tournament["Start date"],
-                "End date": tournament["End date"],
-                "Place": tournament["Place"],
-                "Number of rounds": tournament["Number of rounds"],
-                "Players": tournament["Players"],
-                "Actual round": tournament["Actual round"],
-                "Rounds list": tournament["Rounds list"],
-                "Manager comment": tournament["Manager comment"]
+                "tournament_name": tournament["tournament_name"],
+                "start_date": tournament["start_date"],
+                "end_date": tournament["end_date"],
+                "place": tournament["place"],
+                "number_of_rounds": tournament["number_of_rounds"],
+                "players": tournament["players"],
+                "current_round": tournament["current_round"],
+                "rounds_list": tournament["rounds_list"],
+                "manager_comment": tournament["manager_comment"]
                 }
         else:
             return None
-        
-    """
-    def add_player(self, player):
-        self.players.append(player)
-        self.save_json(self)
-
-    """
 
     @classmethod
     def add_player(cls, tournament_id, player):
@@ -111,22 +104,22 @@ class Tournament:
         """
         tournament = tournament_table.get(doc_id=int(tournament_id))
     
-        players = tournament.get("Players") or []  # si None -> []
+        players = tournament.get("players") or []  # si None -> []
         players.append([player, 0.0])
 
-        tournament_table.update({"Players": players}, doc_ids=[int(tournament_id)])
+        tournament_table.update({"players": players}, doc_ids=[int(tournament_id)])
 
     @classmethod
     def add_round(cls, tournament_name, round):
         """ Update the rounds_list of the tournament by adding the round (list of games) to the list
         """
         TournamentQuery = Query()
-        tournaments = tournament_table.search(TournamentQuery["Tournament name"] == tournament_name)
+        tournaments = tournament_table.search(TournamentQuery["tournament_name"] == tournament_name)
 
         if tournaments:
             tournament = tournaments[0]
-            rounds_list = tournament.get("Rounds list", [])
+            rounds_list = tournament.get("rounds_list", [])
             rounds_list.append(round)
-            tournament_table.update({"Rounds list": rounds_list}, TournamentQuery["Tournament name"] == tournament_name)
+            tournament_table.update({"rounds_list": rounds_list}, TournamentQuery["tournament_name"] == tournament_name)
 
     
