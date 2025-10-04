@@ -34,6 +34,7 @@ class Tournament:
         self.rounds_list = []
         self.current_round = 1
         self.manager_comment = None
+        self.state = "not_started"
 
 
     @classmethod
@@ -58,7 +59,8 @@ class Tournament:
             "players": self.players,
             "current_round" : self.current_round,
             "rounds_list" : self.rounds_list,
-            "manager_comment" : self.manager_comment
+            "manager_comment" : self.manager_comment,
+            "state": self.state
         }, (Query()['tournament_name'] == self.tournament_name))
 
     @classmethod
