@@ -22,8 +22,6 @@ class Tournament:
             start_date : The start date of the tournament.
             end_date : The end date of the tournament.
             number_of_rounds : The number of rounds in the tournament. Defaults to 4.
-            players : A list of player National Chess IDs. Defaults to an empty list.
-
         """
         self.tournament_name = tournament_name.upper()
         self.place = place
@@ -74,7 +72,6 @@ class Tournament:
         Returns:
             list or None: A list containing the tournament's details or None.
         """
-        
         TournamentQuery = Query()
         tournament = tournament_table.get(TournamentQuery["Tournament name"] == tournament_name)
 
@@ -88,7 +85,8 @@ class Tournament:
                 "players": tournament["players"],
                 "current_round": tournament["current_round"],
                 "rounds_list": tournament["rounds_list"],
-                "manager_comment": tournament["manager_comment"]
+                "manager_comment": tournament["manager_comment"],
+                "state": tournament["state"]
                 }
         else:
             return None
@@ -99,7 +97,7 @@ class Tournament:
         Add a player to the specified tournament in the JSON database.
 
         Args:
-            tournament_name : The name of the tournament to add the player to.
+            tournament_name : The name of the tournament to add the player to
             player : The National Chess ID of the player to add.
 
         Updates the tournament's player list in the database.
