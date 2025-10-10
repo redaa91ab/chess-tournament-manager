@@ -12,7 +12,7 @@ class Tournament:
     retrieve or update tournament information.
     """
 
-    def __init__(self, tournament_name, place, start_date, end_date, number_of_rounds = 4):
+    def __init__(self, tournament_name, place, start_date, number_of_rounds = 4):
         """
         Initialize a Tournament instance with the provided details.
 
@@ -26,23 +26,14 @@ class Tournament:
         self.tournament_name = tournament_name.upper()
         self.place = place
         self.start_date = start_date
-        self.end_date = end_date
+        self.end_date = None
         self.number_of_rounds = number_of_rounds
         self.players = []
         self.rounds_list = []
-        self.current_round = 1
+        self.current_round = {"round_number" : 0, "state" : None}
         self.manager_comment = None
         self.state = "not_started"
 
-
-    @classmethod
-    def get_all_tournaments(cls) :
-        tournaments = {}
-        for tournament in tournament_table.all():
-                tournaments[tournament.doc_id] = tournament
-
-        return tournaments
-            
 
     def save_json(self):
         """
@@ -60,6 +51,16 @@ class Tournament:
             "manager_comment" : self.manager_comment,
             "state": self.state
         }, (Query()['tournament_name'] == self.tournament_name))
+
+
+    @classmethod
+    def get_all_tournaments(cls) :
+        tournaments = {}
+        for tournament in tournament_table.all():
+                tournaments[tournament.doc_id] = tournament
+
+        return tournaments
+            
 
     @classmethod
     def get_tournament_details(cls, tournament_name):
@@ -108,6 +109,16 @@ class Tournament:
         players.append([player, 0.0])
 
         tournament_table.update({"players": players}, doc_ids=[int(tournament_id)])
+
+
+    @classmethod
+    def update_state_tournament(cls, tournament_id, new_state):
+        """
+        Update the variable "state" of the tournament in parameters in the file tournaments.json
+        """
+
+        tournament_table.update({"state": new_state}, doc_ids=[int(tournament_id)])
+
 
     @classmethod
     def add_round(cls, tournament_name, round):

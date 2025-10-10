@@ -1,5 +1,4 @@
 from models import Player
-from rich import print
 
 class PlayersController: 
     """

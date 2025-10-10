@@ -1,5 +1,4 @@
-from models import Tournament, Player
-from rich import print
+from models import Tournament, Player, Round
 from datetime import datetime
 
 
@@ -30,7 +29,6 @@ class TournamentsController:
         tournament_name = self.view.get_input("Tournament name : ").upper()
         place = self.view.get_input("Place : ")
         start_date = self.view.get_input("Start date (DD/MM/YYYY) : ")
-        end_date = self.view.get_input("End date (DD/MM/YYYY): ")
         number_of_rounds = self.view.get_input("Number of rounds : ")
 
         try:
@@ -39,12 +37,12 @@ class TournamentsController:
             
             number_of_rounds = int(number_of_rounds)
             datetime.strptime(start_date, "%d/%m/%Y")
-            datetime.strptime(end_date, "%d/%m/%Y")
+
         except ValueError as e:
             self.view.show_message(f"Invalid input: {e}")
             return
 
-        tournament = Tournament(tournament_name, place, start_date, end_date, number_of_rounds)
+        tournament = Tournament(tournament_name, place, start_date, number_of_rounds)
         tournament.save_json()
 
     def add_player_tournament(self, tournament_id = None):
@@ -120,6 +118,7 @@ class TournamentsController:
             else :
                 self.view.show_message("We didn't find any match, please try again")
 
+        """
         def is_round_finished(rounds_list, players):
             if len(rounds_list) < 1 :
                 return True
@@ -133,21 +132,30 @@ class TournamentsController:
                                 if player_game[1] != player_players[1] :
                                     return True
                 return False
+        """
 
         while True :
             tournaments = Tournament.get_all_tournaments()
             tournament_details = tournaments[tournament_id]
             rounds_list = tournament_details["rounds_list"]
             players = tournament_details["players"]
+            current_round = tournament_details["current_round"]
             self.view.show_play_tournament_menu()
             user_input = self.view.get_input("\nSelect an option : ")
             if user_input == "1" or user_input == "1)" :
-                if is_round_finished(rounds_list, players) == True :
+                if current_round["state"] == "in_progress" :
+                    self.view.show_message("Please update the last round before to create a new one")
+                else :
+                    if tournament_details["state"] == "not_started" :
+                        Tournament.update_state_tournament(tournament_id, "in_progress")
+                    Round(tournament_id).update_current_round(current_round["round_number"] + 1, "in_progress_test")
                     new_round = self.generate_round(tournament_details)
                     self.view.show_message(new_round)
-                else :
-                    self.view.show_message("Please update the last round before to create a new one")
-            if user_input == "4" or user_input == "4)" :
+            elif user_input == "2" or user_input == "2)" :
+                pass
+            elif user_input == "3" or user_input == "3)" :
+                pass
+            elif user_input == "4" or user_input == "4)" :
                 break
         
 
