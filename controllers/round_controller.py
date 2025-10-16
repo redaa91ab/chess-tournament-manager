@@ -10,22 +10,31 @@ class RoundController :
         """
         Display the games of the new round
         """
-        tournaments = Tournament.get_all_tournaments()
-        tournament_details = tournaments[tournament_id]
+        
+
+        tournament_details = Tournament.get_all_tournaments()[tournament_id]
         current_round = tournament_details["current_round"]
-        #self.view.show_play_tournament_menu()
-        #user_input = self.view.get_input("\nSelect an option : ")
 
-
+        round_model = Round(tournament_id)
+  
         while True :
+            if tournament_details["state"] == "not_started" :
+                Tournament.update_state_tournament(tournament_id, "in_progress")
+            
+            # Output selon l'etat du round :
             if current_round["state"] == "in_progress" :
-                self.view.show_message("Please update the last round before to create a new one")
-            else :
-                if tournament_details["state"] == "not_started" :
-                    Tournament.update_state_tournament(tournament_id, "in_progress")
-                Round(tournament_id).update_current_round(current_round["round_number"] + 1, "in_progress_test")
+                self.view.show_message("Please update the current round before to create a new one")
+                break
+            elif current_round["state"] == "not_started" :
+                round_model.update_current_round(current_round["round_number"], "in_progress")
                 new_round = self.generate_round(tournament_details)
                 self.view.show_message(new_round)
+                break
+            elif current_round["state"] == "finished" :
+                round_model.update_current_round(current_round["round_number"] + 1, "in_progress")
+                new_round = self.generate_round(tournament_details)
+                self.view.show_message(new_round)
+                break
 
         
     def generate_round(self, tournament):

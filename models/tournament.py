@@ -117,7 +117,7 @@ class Tournament:
         Update the variable "state" of the tournament in parameters in the file tournaments.json
         """
 
-        tournament_table.update({"state": new_state}, doc_ids=[int(tournament_id)])
+        tournament_table.update({"state": new_state}, doc_ids=[tournament_id])
 
 
     @classmethod
