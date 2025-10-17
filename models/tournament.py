@@ -31,6 +31,7 @@ class Tournament:
         self.players = []
         self.rounds_list = []
         self.current_round = {"round_number" : 0, "state" : None}
+        self.previous_opponents = None
         self.manager_comment = None
         self.state = "not_started"
 
@@ -41,13 +42,14 @@ class Tournament:
         """
         tournament_table.upsert({
             "tournament_name": self.tournament_name,
+            "place": self.place,
             "start_date" : self.start_date,
             "end_date": self.end_date,
-            "place": self.place,
             "number_of_rounds": self.number_of_rounds,
             "players": self.players,
-            "current_round" : self.current_round,
             "rounds_list" : self.rounds_list,
+            "current_round" : self.current_round,
+            "previous_opponents" : self.previous_opponents,
             "manager_comment" : self.manager_comment,
             "state": self.state
         }, (Query()['tournament_name'] == self.tournament_name))
@@ -58,12 +60,11 @@ class Tournament:
         tournaments = {}
         for tournament in tournament_table.all():
                 tournaments[tournament.doc_id] = tournament
-
         return tournaments
             
 
     @classmethod
-    def get_tournament_details(cls, tournament_name):
+    def get_tournament_details(cls, tournament_id):
         """
         Retrieve details of a tournament by its name from the JSON database.
 
@@ -73,22 +74,11 @@ class Tournament:
         Returns:
             list or None: A list containing the tournament's details or None.
         """
-        TournamentQuery = Query()
-        tournament = tournament_table.get(TournamentQuery["Tournament name"] == tournament_name)
+        tournament = tournament_table.get(doc_id=int(tournament_id))
+
 
         if tournament:
-            return {
-                "tournament_name": tournament["tournament_name"],
-                "start_date": tournament["start_date"],
-                "end_date": tournament["end_date"],
-                "place": tournament["place"],
-                "number_of_rounds": tournament["number_of_rounds"],
-                "players": tournament["players"],
-                "current_round": tournament["current_round"],
-                "rounds_list": tournament["rounds_list"],
-                "manager_comment": tournament["manager_comment"],
-                "state": tournament["state"]
-                }
+            return tournament
         else:
             return None
 
@@ -121,16 +111,14 @@ class Tournament:
 
 
     @classmethod
-    def add_round(cls, tournament_name, round):
+    def add_round(cls, tournament_id, round):
         """ Update the rounds_list of the tournament by adding the round (list of games) to the list
         """
-        TournamentQuery = Query()
-        tournaments = tournament_table.search(TournamentQuery["tournament_name"] == tournament_name)
+        tournament = tournament_table.get(doc_id=int(tournament_id))
 
-        if tournaments:
-            tournament = tournaments[0]
+        if tournament:
             rounds_list = tournament.get("rounds_list", [])
             rounds_list.append(round)
-            tournament_table.update({"rounds_list": rounds_list}, TournamentQuery["tournament_name"] == tournament_name)
+            tournament_table.update({"rounds_list": rounds_list}, doc_ids=[int(tournament_id)])
 
     

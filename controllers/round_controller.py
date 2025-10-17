@@ -10,11 +10,9 @@ class RoundController :
         """
         Display the games of the new round
         """
-        
 
-        tournament_details = Tournament.get_all_tournaments()[tournament_id]
+        tournament_details = Tournament.get_tournament_details(tournament_id)
         current_round = tournament_details["current_round"]
-
         round_model = Round(tournament_id)
   
         while True :
@@ -25,15 +23,10 @@ class RoundController :
             if current_round["state"] == "in_progress" :
                 self.view.show_message("Please update the current round before to create a new one")
                 break
-            elif current_round["state"] == "not_started" :
-                round_model.update_current_round(current_round["round_number"], "in_progress")
+            elif current_round["state"] == None or current_round["state"] == "finished"  :
                 new_round = self.generate_round(tournament_details)
                 self.view.show_message(new_round)
-                break
-            elif current_round["state"] == "finished" :
                 round_model.update_current_round(current_round["round_number"] + 1, "in_progress")
-                new_round = self.generate_round(tournament_details)
-                self.view.show_message(new_round)
                 break
 
         

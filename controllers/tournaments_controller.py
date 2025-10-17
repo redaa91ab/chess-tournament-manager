@@ -120,43 +120,13 @@ class TournamentsController:
             else :
                 self.view.show_message("We didn't find any match, please try again")
 
-        """
-        def is_round_finished(rounds_list, players):
-            if len(rounds_list) < 1 :
-                return True
-            else :
-                last_round = rounds_list[len(rounds_list)-1]
-                for game in last_round :
-                    for player_game in game :
-                        for player_players in players :
-                            
-                            if player_game[0] == player_players[0] :
-                                if player_game[1] != player_players[1] :
-                                    return True
-                return False
-        """
-
         while True :
             tournaments = Tournament.get_all_tournaments()
             tournament_details = tournaments[tournament_id]
-            rounds_list = tournament_details["rounds_list"]
-            players = tournament_details["players"]
-            current_round = tournament_details["current_round"]
             self.view.show_play_tournament_menu()
             user_input = self.view.get_input("\nSelect an option : ")
             if user_input == "1" or user_input == "1)" :
-                """
-                if current_round["state"] == "in_progress" :
-                    self.view.show_message("Please update the last round before to create a new one")
-                else :
-                    if tournament_details["state"] == "not_started" :
-                        Tournament.update_state_tournament(tournament_id, "in_progress")
-                    Round(tournament_id).update_current_round(current_round["round_number"] + 1, "in_progress_test")
-                    new_round = self.generate_round(tournament_details)
-                    self.view.show_message(new_round)
-                """
                 self.round.create_round_menu(tournament_id)
-                
             elif user_input == "2" or user_input == "2)" :
                 pass
             elif user_input == "3" or user_input == "3)" :
@@ -173,7 +143,6 @@ class TournamentsController:
             tournament : The tournament where to generate
         
         """
-        
         def have_played_before(p1, p2, past_rounds):
             """
             return True if the two players have played in the past rounds on this tournament
