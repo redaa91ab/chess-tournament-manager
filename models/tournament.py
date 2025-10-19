@@ -35,12 +35,11 @@ class Tournament:
         self.manager_comment = None
         self.state = "not_started"
 
-
-    def save_json(self):
+    def serialize(self):
         """
-        Save the tournament's details to the tournaments JSON database.
+        Serialize the python object of the tournament model to a dict
         """
-        tournament_table.upsert({
+        serialized_data = {
             "tournament_name": self.tournament_name,
             "place": self.place,
             "start_date" : self.start_date,
@@ -52,7 +51,16 @@ class Tournament:
             "previous_opponents" : self.previous_opponents,
             "manager_comment" : self.manager_comment,
             "state": self.state
-        }, (Query()['tournament_name'] == self.tournament_name))
+        }
+
+        return serialized_data
+
+
+    def save_json(self):
+        """
+        Save the tournament's details to the tournaments JSON database.
+        """
+        tournament_table.upsert(self.serialize, (Query()['tournament_name'] == self.tournament_name))
 
 
     @classmethod
