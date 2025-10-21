@@ -2,7 +2,6 @@ from views import View
 from .players_controller import PlayersController
 from .tournaments_controller import TournamentsController
 from rich import print
-import sys
 
 class AppController:
     """
@@ -19,7 +18,7 @@ class AppController:
         """
         self.view = View()
         self.players = PlayersController(self.view, self)
-        self.tournament = TournamentsController(self.view, self)
+        self.tournament = TournamentsController(self.view)
 
 
     def run(self):

@@ -52,19 +52,6 @@ class Tournament:
             "manager_comment" : self.manager_comment,
             "state": self.state
         }
-
-        #Else : save/update = 1) Deserialize json data
-                            # 2) Init tournament object with data deserialized from json and only change what you wanna change
-                            # 3) use save_json and make sure upsert tournament_id
-                            # 4) Clear example :
-                            #     def update (self, t_id) :
-                            #         tournament_details = self.deserialize(t_id) #return tournament details, check deserialize
-                            #         Tournament(tournament_details["name"],...etc).save_json #trop long
-                            # 2nd option : def update(self, element_to_update, new_element, t_id) :
-                            #                        tournament_table.update({element_to update: new_element}, doc_ids=[tournament_id])
-                            # 3rd option : Not, make it clean.   
-                                                
-
         return serialized_data
 
 
@@ -104,17 +91,18 @@ class Tournament:
     @classmethod
     def update_element(cls, tournament_id, element_to_update, new_element) :
         """
+        If the data to update is something to add
+        elif it's the whole element to remplace
         """
         if element_to_update == "rounds_list" or element_to_update == "players" :
-            
+        
             tournament = tournament_table.get(doc_id=int(tournament_id))
-            data = tournament.get(element) or []  # si None -> []
-            players.append([player, 0.0])
-            tournament_table.update({"players": players}, doc_ids=[int(tournament_id)])
+            data = tournament.get(element_to_update) or []  # if == None return []
+            data.append(new_element)
+            tournament_table.update({element_to_update: data}, doc_ids=[int(tournament_id)])
         else :
             tournament_table.update({element_to_update: new_element}, doc_ids=[tournament_id])
-            
-
+    
     @classmethod
     def add_player(cls, tournament_id, player):
         """
@@ -123,7 +111,6 @@ class Tournament:
         Args:
             tournament_name : The name of the tournament to add the player to
             player : The National Chess ID of the player to add.
-
         Updates the tournament's player list in the database.
         """
         tournament = tournament_table.get(doc_id=int(tournament_id))
@@ -153,4 +140,6 @@ class Tournament:
         tournament_table.update({"state": new_state}, doc_ids=[tournament_id])
 
 
-    
+class Round :
+    def __init__(self, tournament_id): 
+        self.tournament_id = tournament_id

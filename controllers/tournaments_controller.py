@@ -1,5 +1,4 @@
-from models import Tournament, Player, Round
-from .round_controller import RoundController
+from models import Tournament, Player
 from datetime import datetime
 
 
@@ -10,17 +9,15 @@ class TournamentsController:
     It provides methods to create a new tournament in tournaments.json and add new players to a tournament
     """
 
-    def __init__(self, view, parent = None):
+    def __init__(self, view):
         """
         Initialize a TournamentsController instance.
 
         Args:
             view: An instance of the View class
-            parent : app_controller.py
         """
-        self.parent = parent
         self.view = view
-        self.round = RoundController(self.view, self)
+        self.round = RoundController(self.view)
 
     def create(self):
         """
@@ -81,7 +78,8 @@ class TournamentsController:
                 national_chess_id = self.view.get_input("Add a player (National Chess ID) : ")
                 player = Player.get_player_details(national_chess_id)
                 if player in Player.get_all_players():
-                    Tournament.add_player(tournament_id, national_chess_id)
+                    #Tournament.add_player(tournament_id, national_chess_id)
+                    Tournament.update_element(tournament_id, "players", [national_chess_id, 0.0])
                     self.view.show_message(f"\n{player["name"]} {player["surname"]} ({player["national_chess_id"]}) was successfully added !")
                 elif player not in Player.get_all_players() or player == None:
                     self.view.show_message("\nThis player doesn't exist :\n1) Try again \n2) Create a new player \n")
@@ -101,7 +99,8 @@ class TournamentsController:
                                 self.view.show_message(f"Invalid input: {e}")
                         
                         Player(national_chess_id, name, surname, birthdate).save_json()
-                        Tournament.add_player(tournament_id, national_chess_id)
+                        #Tournament.add_player(tournament_id, national_chess_id)
+                        Tournament.update_element(tournament_id, "players", [national_chess_id, 0.0])
                         self.view.show_message(f"\n{name} {surname} ({national_chess_id}) was successfully added !")
                 
             elif user_choice == "2" or user_choice == "2)":
@@ -122,7 +121,6 @@ class TournamentsController:
 
         while True :
             tournaments = Tournament.get_all_tournaments()
-            tournament_details = tournaments[tournament_id]
             self.view.show_play_tournament_menu()
             user_input = self.view.get_input("\nSelect an option : ")
             if user_input == "1" or user_input == "1)" :
@@ -133,9 +131,37 @@ class TournamentsController:
                 pass
             elif user_input == "4" or user_input == "4)" :
                 break
-        
 
-    def generate_round(self, tournament):
+
+class RoundController :
+    
+    def __init__(self, view):
+        self.view = view
+
+    def create_round_menu(self, tournament_id) :
+        """
+        Display the games of the new round
+        """
+
+        tournament_details = Tournament.get_tournament_details(tournament_id)
+        current_round = tournament_details["current_round"]
+
+        while True :
+            if tournament_details["state"] == "not_started" :
+                Tournament.update_element(tournament_id, "state", "in_progress")
+            
+            # Output selon l'etat du round :
+            if current_round["state"] == "in_progress" :
+                self.view.show_message("Please update the current round before to create a new one")
+                break
+            elif current_round["state"] == None or current_round["state"] == "finished"  :
+                new_round = self.generate_round(tournament_details)
+                Tournament.update_element(tournament_id, "current_round", {"round_number": current_round["round_number"] + 1, "state": "in_progress"})
+                self.view.show_message(new_round)
+                break
+
+        
+    def generate_round(self, tournament_id):
         """
         return a list new round for the tournament, based on actual players, score, and past rounds.
 
@@ -143,6 +169,7 @@ class TournamentsController:
             tournament : The tournament where to generate
         
         """
+        
         def have_played_before(p1, p2, past_rounds):
             """
             return True if the two players have played in the past rounds on this tournament
@@ -161,7 +188,8 @@ class TournamentsController:
                         return True
             return False
             
-        players = tournament["players"]
+        tournament_details = Tournament.get_tournament_details(tournament_id)
+        players = tournament_details["players"]
         players.sort(key=lambda x: x[1])
         
         new_round = [] # liste des matchs du round
@@ -176,7 +204,7 @@ class TournamentsController:
                 if opponent in used_players or opponent == player:
                     continue
 
-                if have_played_before(player, opponent, tournament["rounds_list"]):
+                if have_played_before(player, opponent, tournament_details["rounds_list"]):
                     continue
                 
                 else :
@@ -191,7 +219,7 @@ class TournamentsController:
                         used_players.extend([player, opponent])
                         break
 
-        Tournament.add_round(tournament["tournament_name"], new_round)
+        Tournament.update_element(tournament_id, "rounds_list", new_round )
         return new_round
     
 
