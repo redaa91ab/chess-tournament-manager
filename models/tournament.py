@@ -1,4 +1,4 @@
-from config import DATA_PLAYERS_PATH, DATA_TOURNAMENTS_PATH
+from config import DATA_TOURNAMENTS_PATH
 from tinydb import TinyDB, Query
 db_tournaments = TinyDB(DATA_TOURNAMENTS_PATH)
 tournament_table = db_tournaments.table("tournaments")
@@ -59,7 +59,7 @@ class Tournament:
         """
         Save the tournament's details to the tournaments JSON database.
         """
-        tournament_table.upsert(self.serialize, (Query()['tournament_name'] == self.tournament_name))
+        tournament_table.upsert(self.serialize(), (Query()['tournament_name'] == self.tournament_name))
 
 
     @classmethod
@@ -141,5 +141,5 @@ class Tournament:
 
 
 class Round :
-    def __init__(self, tournament_id): 
-        self.tournament_id = tournament_id
+    def __init__(self): 
+        pass

@@ -2,7 +2,6 @@ from models import Tournament, Player
 from datetime import datetime
 
 
-
 class TournamentsController:
     """
     A controller class for managing tournament.
@@ -30,6 +29,7 @@ class TournamentsController:
         start_date = self.view.get_input("Start date (DD/MM/YYYY) : ")
         number_of_rounds = self.view.get_input("Number of rounds : ")
 
+        """
         try:
             if Tournament.get_tournament_details(tournament_name) != None :
                 raise ValueError("This tournament name is already taken")
@@ -40,7 +40,7 @@ class TournamentsController:
         except ValueError as e:
             self.view.show_message(f"Invalid input: {e}")
             return
-
+        """
         tournament = Tournament(tournament_name, place, start_date, number_of_rounds)
         tournament.save_json()
 
@@ -149,13 +149,13 @@ class RoundController :
         while True :
             if tournament_details["state"] == "not_started" :
                 Tournament.update_element(tournament_id, "state", "in_progress")
-            
+
             # Output selon l'etat du round :
             if current_round["state"] == "in_progress" :
                 self.view.show_message("Please update the current round before to create a new one")
                 break
             elif current_round["state"] == None or current_round["state"] == "finished"  :
-                new_round = self.generate_round(tournament_details)
+                new_round = self.generate_round(tournament_id)
                 Tournament.update_element(tournament_id, "current_round", {"round_number": current_round["round_number"] + 1, "state": "in_progress"})
                 self.view.show_message(new_round)
                 break
