@@ -94,4 +94,36 @@ class View:
             tournament_name = tournaments[tournament_id]["tournament_name"]
             print(f"{tournament_id}) {tournament_name}")
 
+    def show_games_list(self, round):
+        print("[bold green]\nGames\n[/bold green]")
+        for i,game in enumerate(round,1) :
+            player1 = game[0][0]
+            player2 = game[1][0]
+            print(f"{i}. {player1} vs {player2}")
+
+    def update_games_results(self, round) :
+        print("[bold green]\nUpdate actual round\n[/bold green]")
+        for i, game in enumerate(round, 1) :
+            player1 = game[0][0]
+            player2 = game[1][0]
+            print(f"{i}. {player1} vs {player2}")
+            get_input = input(f"Enter the national chess ID of the winner :")
+            #save a chaque iteration
+    
+    def update_game_result(self, game) :
+        """return the winner of the game"""
+        print("[bold green]\nUpdate actual round\n[/bold green]")
+        player1 = game[0][0]
+        player2 = game[1][0]
+        print(f"{player1} vs {player2}")
+        return input(f"\n Enter the national chess ID of the winner :")
+        #save a chaque iteration
+        #or 
+
+
+
+            
+
+
+
 

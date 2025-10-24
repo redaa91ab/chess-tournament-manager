@@ -94,7 +94,7 @@ class Tournament:
         If the data to update is something to add
         elif it's the whole element to remplace
         """
-        if element_to_update == "rounds_list" or element_to_update == "players" :
+        if element_to_update == "rounds_list" or element_to_update == "players" :#2 WAYS players = add or change  
         
             tournament = tournament_table.get(doc_id=int(tournament_id))
             data = tournament.get(element_to_update) or []  # if == None return []
@@ -102,44 +102,40 @@ class Tournament:
             tournament_table.update({element_to_update: data}, doc_ids=[int(tournament_id)])
         else :
             tournament_table.update({element_to_update: new_element}, doc_ids=[tournament_id])
-    
-    @classmethod
-    def add_player(cls, tournament_id, player):
-        """
-        Add a player to the specified tournament in the JSON database.
 
-        Args:
-            tournament_name : The name of the tournament to add the player to
-            player : The National Chess ID of the player to add.
-        Updates the tournament's player list in the database.
+    @classmethod
+    def update_score(cls, tournament_id, winner_nid) :
+        """
+        If the data to update is something to add
+        elif it's the whole element to remplace
         """
         tournament = tournament_table.get(doc_id=int(tournament_id))
+        players = tournament.get("players")
+        print(players)
+        new_players = []
+        for player in players :
+            print(player)
+            if player[0] == winner_nid :
+                player_updated = [player[0], player[1]+1]
+                new_players.append(player_updated)
+            else :
+                new_players.append(player)
+        
+        tournament_table.update({"players": new_players}, doc_ids=[tournament_id])
+        
+
+
+
     
-        players = tournament.get("players") or []  # si None -> []
-        players.append([player, 0.0]) # remplacer player
-
-        tournament_table.update({"players": players}, doc_ids=[int(tournament_id)])
-
-    @classmethod
-    def add_round(cls, tournament_id, round):
-        """ Update the rounds_list of the tournament by adding the round (list of games) to the list
-        """
-        tournament = tournament_table.get(doc_id=int(tournament_id))
-
-        rounds_list = tournament.get("rounds_list") or []
-        rounds_list.append(round)
-
-        tournament_table.update({"rounds_list": rounds_list}, doc_ids=[int(tournament_id)])
-
-    @classmethod
-    def update_state_tournament(cls, tournament_id, new_state):
-        """
-        Update the variable "state" of the tournament in parameters in the file tournaments.json
-        """
-
-        tournament_table.update({"state": new_state}, doc_ids=[tournament_id])
 
 
 class Round :
     def __init__(self): 
         pass
+
+    @classmethod
+    def get_last_round(self, tournament_id):
+        tournament_details = Tournament.get_tournament_details(tournament_id)
+        rounds_list = tournament_details["rounds_list"]
+        return rounds_list[-1]
+    
