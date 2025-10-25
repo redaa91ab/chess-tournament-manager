@@ -53,14 +53,16 @@ class TournamentsController:
         """
 
         tournaments = Tournament.get_all_tournaments()
+        print(tournaments)
   
-        while tournament_id == None :
+        while True :
             self.view.show_tournaments_list(tournaments)
             user_input = self.view.get_input("\nEnter the tournament id : ") 
-            if int(user_input) in tournaments :
-                tournament_id = int(user_input)
-            else :
+            tournament = Tournament.deserialize(user_input)
+            if tournament == None :
                 self.view.show_message("We didn't find any match, please try again")
+            else :
+                break
 
         while True :
             tournament_details = tournaments[tournament_id]
@@ -74,7 +76,6 @@ class TournamentsController:
                 national_chess_id = self.view.get_input("Add a player (National Chess ID) : ")
                 player = Player.get_player_details(national_chess_id)
                 if player in Player.get_all_players():
-                    #Tournament.add_player(tournament_id, national_chess_id)
                     Tournament.update_element(tournament_id, "players", [national_chess_id, 0.0])
                     self.view.show_message(f"\n{player["name"]} {player["surname"]} ({player["national_chess_id"]}) was successfully added !")
                 elif player not in Player.get_all_players() or player == None:
@@ -95,7 +96,6 @@ class TournamentsController:
                                 self.view.show_message(f"Invalid input: {e}")
                         
                         Player(national_chess_id, name, surname, birthdate).save_json()
-                        #Tournament.add_player(tournament_id, national_chess_id)
                         Tournament.update_element(tournament_id, "players", [national_chess_id, 0.0])
                         self.view.show_message(f"\n{name} {surname} ({national_chess_id}) was successfully added !")
                 

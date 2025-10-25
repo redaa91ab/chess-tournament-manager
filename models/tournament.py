@@ -12,7 +12,8 @@ class Tournament:
     retrieve or update tournament information.
     """
 
-    def __init__(self, tournament_name, place, start_date, number_of_rounds = 4):
+    def __init__(self, tournament_name, place, start_date, number_of_rounds = 4, end_date = None, players = [], rounds_list = [],
+                 current_round = {"round_number" : 0, "state" : None}, previous_opponents = None, manager_comment = None, state = "not_started"):
         """
         Initialize a Tournament instance with the provided details.
 
@@ -23,28 +24,26 @@ class Tournament:
             end_date : The end date of the tournament.
             number_of_rounds : The number of rounds in the tournament. Defaults to 4.
         """
-        self.tournament_name = tournament_name.upper()
+        self.tournament_name = tournament_name
         self.place = place
         self.start_date = start_date
-        self.end_date = None
         self.number_of_rounds = number_of_rounds
-        self.players = []
-        self.rounds_list = []
-        self.current_round = {"round_number" : 0, "state" : None}
-        self.previous_opponents = None
-        self.manager_comment = None
-        self.state = "not_started"
+        self.end_date = end_date
+        self.players = players
+        self.rounds_list = rounds_list
+        self.current_round = current_round
+        self.previous_opponents = previous_opponents
+        self.manager_comment = manager_comment
+        self.state = state
 
     def serialize(self):
-        """
-        Serialize the python object of the tournament model to a dict
-        """
+        """ Serialize the python object of the tournament model and return a dict"""
         serialized_data = {
             "tournament_name": self.tournament_name,
             "place": self.place,
             "start_date" : self.start_date,
-            "end_date": self.end_date,
             "number_of_rounds": self.number_of_rounds,
+            "end_date": self.end_date,
             "players": self.players,
             "rounds_list" : self.rounds_list,
             "current_round" : self.current_round,
@@ -53,17 +52,38 @@ class Tournament:
             "state": self.state
         }
         return serialized_data
+    
+    @classmethod
+    def deserialize(cls, tournament_id):
+        """Transforme un dict JSON en objet Tournament"""
+        tournament_details = tournament_table.get(doc_id=tournament_id)
+
+        tournament_name = tournament_details["tourament_name"]
+        place = tournament_details["place"]
+        start_date = tournament_details["start_date"]
+        number_of_rounds = tournament_details["number_of_rounds"]
+        end_date = tournament_details["end_date"]
+        players = tournament_details["players"]
+        rounds_list = tournament_details["rounds_list"]
+        current_round = tournament_details["current_round"]
+        previous_opponents = tournament_details["previous_opponents"]
+        manager_comment = tournament_details["manager_comment"]
+        state = tournament_details["state"]
+
+        tournament_object = Tournament(tournament_name, place, start_date, number_of_rounds, end_date, players,rounds_list, current_round,
+                                       previous_opponents, manager_comment, state)
+        
+        return tournament_object
 
 
     def save_json(self):
-        """
-        Save the tournament's details to the tournaments JSON database.
-        """
-        tournament_table.upsert(self.serialize(), (Query()['tournament_name'] == self.tournament_name))
+        """ Save the tournament's details to the tournaments JSON database. """
+        tournament_table.insert(self.serialize())
 
 
     @classmethod
     def get_all_tournaments(cls) :
+        """ return a dict of all tournament """
         tournaments = {}
         for tournament in tournament_table.all():
                 tournaments[tournament.doc_id] = tournament
@@ -123,11 +143,6 @@ class Tournament:
         
         tournament_table.update({"players": new_players}, doc_ids=[tournament_id])
         
-
-
-
-    
-
 
 class Round :
     def __init__(self): 
