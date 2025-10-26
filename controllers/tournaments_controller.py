@@ -40,7 +40,7 @@ class TournamentsController:
         tournament = Tournament(tournament_name, place, start_date, number_of_rounds)
         tournament.save_json()
 
-    def add_player_tournament(self, tournament_id = None):
+    def add_player_tournament(self):
         """
         Add players to a tournament in tournaments.json
 
@@ -52,28 +52,19 @@ class TournamentsController:
         If a player doesn't exist, offers the option to create a new player or try again.
         """
 
-        tournaments = Tournament.get_all_tournaments()
-        print(tournaments)
-  
-        while True :
-            self.view.show_tournaments_list(tournaments)
-            user_input = self.view.get_input("\nEnter the tournament id : ") 
-            tournament = Tournament.deserialize(user_input)
-            if tournament == None :
-                self.view.show_message("We didn't find any match, please try again")
-            else :
-                break
 
         while True :
-            tournament_details = tournaments[tournament_id]
-            tournament_name = tournament_details["tournament_name"]
-            self.view.show_message(f"[bold green]\n{tournament_name}[/bold green]")
-            self.view.show_add_players_tournament_menu()
+            tournaments = Tournament.deserialize_all_tournaments()
+            self.view.show_tournaments_list_test(tournaments)
+            tournament = self._select_tournament()
+            tournament_name = tournament.tournament_name
+            self.view.show_add_players_tournament_menu(tournament_name)
             user_choice = self.view.get_input("\nChoose an option : ")
 
             if user_choice == "1" or user_choice == "1)":
                 self.view.show_message(f"\n[bold green]\n{tournament_name}[/bold green]\n")
                 national_chess_id = self.view.get_input("Add a player (National Chess ID) : ")
+                #self.view.add_player_tournament_menu2(tournamant_name) #menu + input jsp
                 player = Player.get_player_details(national_chess_id)
                 if player in Player.get_all_players():
                     Tournament.update_element(tournament_id, "players", [national_chess_id, 0.0])
@@ -128,6 +119,23 @@ class TournamentsController:
             elif user_input == "4" or user_input == "4)" :
                 break
 
+    def _select_tournament(self) :
+        """
+        Display choice of tournaments
+        Return tournament object
+        """
+        while True:
+            tournaments = Tournament.get_all_tournaments()
+            self.view.show_tournaments_list(tournaments)
+
+            user_input = self.view.get_input("\nSelect a tournament :")
+            tournament_id = int(user_input)
+            tournament = Tournament.deserialize(tournament_id)
+
+            if tournament is None:
+                self.view.show_message("No tournament was find with that ID. Please try again.")
+            else:
+                return tournament
 
 class RoundController :
     
@@ -145,7 +153,6 @@ class RoundController :
         while True :
             if tournament_details["state"] == "not_started" :
                 Tournament.update_element(tournament_id, "state", "in_progress")
-
             # Output selon l'etat du round :
             if current_round["state"] == "in_progress" :
                 self.view.show_message("Please update the current round before to create a new one")
