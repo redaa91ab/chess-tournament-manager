@@ -68,13 +68,13 @@ class View:
         print("2) Add players")
         print("[red]3) Back [/red]")
 
-    def show_add_players_tournament_menu(self, tournament_name):
+    def show_add_players_tournament_menu(self, tournament):
         """
         Display the menu for adding players to a tournament.
 
         Shows options for adding new players or going back.
         """
-        (f"[bold green]\n{tournament_name}[/bold green]")
+        (f"[bold green]\n{tournament.tournament_name}[/bold green]")
         print("\n1) Add new players")
         print("2)[red] Back[/red]")
 
@@ -92,19 +92,12 @@ class View:
 
     def show_tournaments_list(self, tournaments):
         print("[bold green]\nAll tournaments\n[/bold green]")
-        for tournament in tournaments:
-            tournament_id = tournament
-            tournament_name = tournaments[tournament_id]["tournament_name"]
-            print(f"{tournament_id}) {tournament_name}") 
 
-    def show_tournaments_list_test(self, tournaments):
-        print("[bold green]\nAll tournaments\n[/bold green]")
-        
         for i, tournament in enumerate(tournaments, 1):
-            name = tournament["tournament_name"]
-            start_date = tournament["start_date"]
-            state = tournament["state"]
-            console.print(f"[bold cyan]{i}.[/] {name} ({start_date}) | [yellow]{state}[/]")
+            tournament_name = tournament.tournament_name
+            start_date = tournament.start_date
+            state = tournament.state
+            console.print(f"[bold cyan]{i}.[/] {tournament_name} ({start_date}) | [yellow]{state}[/]")
 
     def show_games_list(self, round):
         print("[bold green]\nGames\n[/bold green]")

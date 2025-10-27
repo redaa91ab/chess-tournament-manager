@@ -54,21 +54,20 @@ class TournamentsController:
 
 
         while True :
-            tournaments = Tournament.deserialize_all_tournaments()
-            self.view.show_tournaments_list_test(tournaments)
             tournament = self._select_tournament()
             tournament_name = tournament.tournament_name
-            self.view.show_add_players_tournament_menu(tournament_name)
+            self.view.show_add_players_tournament_menu(tournament)
             user_choice = self.view.get_input("\nChoose an option : ")
 
             if user_choice == "1" or user_choice == "1)":
                 self.view.show_message(f"\n[bold green]\n{tournament_name}[/bold green]\n")
                 national_chess_id = self.view.get_input("Add a player (National Chess ID) : ")
-                #self.view.add_player_tournament_menu2(tournamant_name) #menu + input jsp
-                player = Player.get_player_details(national_chess_id)
-                if player in Player.get_all_players():
-                    Tournament.update_element(tournament_id, "players", [national_chess_id, 0.0])
-                    self.view.show_message(f"\n{player["name"]} {player["surname"]} ({player["national_chess_id"]}) was successfully added !")
+                
+                player = Player.deserialize(national_chess_id)
+                if player in Player.deserialize_all_players():
+                    tournament.players.append([national_chess_id, 0.0])
+                    tournament.save_json()
+                    self.view.show_message(f"\n{player["name"]} {player["surname"]} ({player["national_chess_id"]}) was successfully added !") #translate
                 elif player not in Player.get_all_players() or player == None:
                     self.view.show_message("\nThis player doesn't exist :\n1) Try again \n2) Create a new player \n")
                     user_choice_option = self.view.get_input("Choose an option : ")
@@ -120,22 +119,19 @@ class TournamentsController:
                 break
 
     def _select_tournament(self) :
-        """
-        Display choice of tournaments
-        Return tournament object
-        """
         while True:
-            tournaments = Tournament.get_all_tournaments()
+            tournaments = Tournament.deserialize_all_tournaments()
             self.view.show_tournaments_list(tournaments)
-
             user_input = self.view.get_input("\nSelect a tournament :")
-            tournament_id = int(user_input)
-            tournament = Tournament.deserialize(tournament_id)
 
-            if tournament is None:
+            if int(user_input) > len(tournaments):
                 self.view.show_message("No tournament was find with that ID. Please try again.")
             else:
+                tournament_index = int(user_input)-1
+                tournament = tournaments[tournament_index]
                 return tournament
+
+
 
 class RoundController :
     

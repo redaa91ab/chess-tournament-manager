@@ -27,16 +27,43 @@ class Player:
         self.birthdate = birthdate
         self.score = score
 
-    def save_json(self):
-        """
-        Save the player's details to the players JSON database using TinyDB.
-        """
-        players_table.insert({
+    def serialize(self):
+        """Return a dict"""
+        player_serialized = {
             "national_chess_id": self.national_chess_id,
             "surname": self.surname,
             "name": self.name,
             "birthdate": self.birthdate,
-        })
+        }
+        return player_serialized
+
+    @classmethod
+    def deserialize(cls, national_chess_id):
+        """Return the player object from the national chess id entered"""
+        players_list = Player.deserialize_all_players()
+        player = next((player for player in players_list if player.national_chess_id == national_chess_id), None)
+        return player
+
+    
+    @classmethod
+    def deserialize_all_players(cls) :
+        """ return a list of all players object """
+        players = []
+        for player in players_table.all():
+            name = player["name"]
+            surname = player["surname"]
+            birthdate = player["birthdate"]
+            score = player["score"]
+
+            player = Player(name, surname, birthdate, score)     
+            player.append(player)
+        return players
+
+    def save_json(self):
+        """
+        Save the player's details to the players JSON database using TinyDB.
+        """
+        players_table.insert(self.serialize())
 
     @classmethod
     def get_all_players(cls):

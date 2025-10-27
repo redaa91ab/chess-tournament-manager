@@ -13,7 +13,7 @@ class Tournament:
     """
 
     def __init__(self, tournament_name, place, start_date, number_of_rounds = 4, end_date = None, players = [], rounds_list = [],
-                 current_round = {"round_number" : 0, "state" : None}, previous_opponents = None, manager_comment = None, state = "not_started"):
+                 current_round = {"round_number" : 0, "state" : None}, previous_opponents = None, manager_comment = None, state = "not_started", tournament_id = None):
         """
         Initialize a Tournament instance with the provided details.
 
@@ -35,6 +35,7 @@ class Tournament:
         self.previous_opponents = previous_opponents
         self.manager_comment = manager_comment
         self.state = state
+        self.tournament_id = None
 
     def serialize(self):
         """ Serialize the python object of the tournament model and return a dict"""
@@ -49,39 +50,67 @@ class Tournament:
             "current_round" : self.current_round,
             "previous_opponents" : self.previous_opponents,
             "manager_comment" : self.manager_comment,
-            "state": self.state
+            "state": self.state,
+            "tournament_id": self.tournament_id
         }
         return serialized_data
     
     @classmethod
     def deserialize(cls, tournament_id):
-        """Transforme un dict JSON en objet Tournament"""
-        tournament_details = tournament_table.get(doc_id=tournament_id) #call get_all_t then t_id = index of the list
+        tournaments_list = Tournament.deserialize_all_tournaments()
+        tournament = tournaments_list[tournament_id]
 
-        if tournament_details is None:
-            return None
-        else :
-            tournament_name = tournament_details["tournament_name"]
-            place = tournament_details["place"]
-            start_date = tournament_details["start_date"]
-            number_of_rounds = tournament_details["number_of_rounds"]
-            end_date = tournament_details["end_date"]
-            players = tournament_details["players"]
-            rounds_list = tournament_details["rounds_list"]
-            current_round = tournament_details["current_round"]
-            previous_opponents = tournament_details["previous_opponents"]
-            manager_comment = tournament_details["manager_comment"]
-            state = tournament_details["state"]
-
-        tournament_object = Tournament(tournament_name, place, start_date, number_of_rounds, end_date, players,rounds_list, current_round,
-                                       previous_opponents, manager_comment, state)
-        
-        return tournament_object
-
+        return tournament
 
     def save_json(self):
         """ Save the tournament's details to the tournaments JSON database. """
-        tournament_table.insert(self.serialize())
+        """
+        if self.tournament_id == None :
+            tournament_table.insert(self.serialize())
+        else :
+            tournament_table.update(self.serialize(), (Query()['tournament_id'] == self.tournament_id))
+        """
+        """
+        if self.tournament_id is None:
+            # Insert new tournament
+            doc_id = tournament_table.insert(self.serialize())
+        """
+        doc_id = tournament_table.insert(self.serialize())
+        print(doc_id)
+
+        self.tournament_id = int(doc_id)
+
+        # Update existing tournament
+        tournament_table.update(self.serialize(), (Query()["tournament_id"] == self.tournament_id))
+        
+
+    
+    @classmethod
+    def deserialize_all_tournaments(cls) :
+        """ return a list of all tournament object """
+        tournaments = []
+        
+        for tournament in tournament_table.all():
+            tournament_name = tournament["tournament_name"]
+            place = tournament["place"]
+            start_date = tournament["start_date"]
+            number_of_rounds = tournament["number_of_rounds"]
+            end_date = tournament["end_date"]
+            players = tournament["players"]
+            rounds_list = tournament["rounds_list"]
+            current_round = tournament["current_round"]
+            previous_opponents = tournament["previous_opponents"]
+            manager_comment = tournament["manager_comment"]
+            state = tournament["state"]
+            tournament_id = tournament.doc_id
+
+
+            tournament = Tournament(tournament_name, place, start_date, number_of_rounds, end_date, players,rounds_list, current_round,
+                                            previous_opponents, manager_comment, state, tournament_id)     
+            tournaments.append(tournament)
+
+        return tournaments
+
 
 
     @classmethod
@@ -92,17 +121,7 @@ class Tournament:
                 tournaments[tournament.doc_id] = tournament
         return tournaments
     
-    @classmethod
-    def deserialize_all_tournaments(cls) :
-        """ return a list of all tournament """
-        tournaments = []
-        for tournament in tournament_table.all():
-                tournaments.append(tournament)
-        return tournaments
-    
-    
-
-            
+  
 
     @classmethod
     def get_tournament_details(cls, tournament_id):
