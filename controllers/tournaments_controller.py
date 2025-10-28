@@ -64,11 +64,12 @@ class TournamentsController:
                 national_chess_id = self.view.get_input("Add a player (National Chess ID) : ")
                 
                 player = Player.deserialize(national_chess_id)
-                if player in Player.deserialize_all_players():
+                
+                if player != None:
                     tournament.players.append([national_chess_id, 0.0])
                     tournament.save_json()
-                    self.view.show_message(f"\n{player["name"]} {player["surname"]} ({player["national_chess_id"]}) was successfully added !") #translate
-                elif player not in Player.get_all_players() or player == None:
+                    self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added !")
+                elif player == None:
                     self.view.show_message("\nThis player doesn't exist :\n1) Try again \n2) Create a new player \n")
                     user_choice_option = self.view.get_input("Choose an option : ")
                     if user_choice_option == "1" or user_choice_option == "1)":
@@ -86,7 +87,8 @@ class TournamentsController:
                                 self.view.show_message(f"Invalid input: {e}")
                         
                         Player(national_chess_id, name, surname, birthdate).save_json()
-                        Tournament.update_element(tournament_id, "players", [national_chess_id, 0.0])
+                        tournament.players.append([national_chess_id, 0.0])
+                        tournament.save_json()
                         self.view.show_message(f"\n{name} {surname} ({national_chess_id}) was successfully added !")
                 
             elif user_choice == "2" or user_choice == "2)":
@@ -130,7 +132,6 @@ class TournamentsController:
                 tournament_index = int(user_input)-1
                 tournament = tournaments[tournament_index]
                 return tournament
-
 
 
 class RoundController :

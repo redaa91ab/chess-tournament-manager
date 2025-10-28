@@ -1,5 +1,6 @@
 from config import DATA_TOURNAMENTS_PATH
 from tinydb import TinyDB, Query
+import uuid 
 db_tournaments = TinyDB(DATA_TOURNAMENTS_PATH)
 tournament_table = db_tournaments.table("tournaments")
 
@@ -35,8 +36,11 @@ class Tournament:
         self.previous_opponents = previous_opponents
         self.manager_comment = manager_comment
         self.state = state
-        self.tournament_id = None
+        self.tournament_id = tournament_id
 
+    def generate_tournament_id(self):
+        return str(uuid.uuid4())
+    
     def serialize(self):
         """ Serialize the python object of the tournament model and return a dict"""
         serialized_data = {
@@ -64,25 +68,12 @@ class Tournament:
 
     def save_json(self):
         """ Save the tournament's details to the tournaments JSON database. """
-        """
-        if self.tournament_id == None :
+    
+        if self.tournament_id is None :
+            self.tournament_id = self.generate_tournament_id()
             tournament_table.insert(self.serialize())
         else :
-            tournament_table.update(self.serialize(), (Query()['tournament_id'] == self.tournament_id))
-        """
-        """
-        if self.tournament_id is None:
-            # Insert new tournament
-            doc_id = tournament_table.insert(self.serialize())
-        """
-        doc_id = tournament_table.insert(self.serialize())
-        print(doc_id)
-
-        self.tournament_id = int(doc_id)
-
-        # Update existing tournament
-        tournament_table.update(self.serialize(), (Query()["tournament_id"] == self.tournament_id))
-        
+            tournament_table.update(self.serialize(), (Query()["tournament_id"] == self.tournament_id))
 
     
     @classmethod
@@ -102,7 +93,7 @@ class Tournament:
             previous_opponents = tournament["previous_opponents"]
             manager_comment = tournament["manager_comment"]
             state = tournament["state"]
-            tournament_id = tournament.doc_id
+            tournament_id = tournament["tournament_id"]
 
 
             tournament = Tournament(tournament_name, place, start_date, number_of_rounds, end_date, players,rounds_list, current_round,

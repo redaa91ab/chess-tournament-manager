@@ -5,12 +5,12 @@ players_table = db_players.table("players")
 
 class Player:
     """
-    A class representing a chess player, storing details (National Chess ID, name, surname, birthdate, score).
+    A class representing a chess player, storing details (National Chess ID, name, surname, birthdate).
     It provides methods to save player data to a JSON
     database and retrieve player information.
     """
 
-    def __init__(self, national_chess_id, name, surname, birthdate, score = 0.0):
+    def __init__(self, national_chess_id, name, surname, birthdate):
         """
         Initialize a Player instance with the provided details.
 
@@ -19,13 +19,12 @@ class Player:
             name : The player's first name.
             surname : The player's surname.
             birthdate : The player's birthdate.
-            score : The player's score in a tournament.
         """
         self.national_chess_id = national_chess_id
         self.name = name   
         self.surname = surname
         self.birthdate = birthdate
-        self.score = score
+        
 
     def serialize(self):
         """Return a dict"""
@@ -50,13 +49,14 @@ class Player:
         """ return a list of all players object """
         players = []
         for player in players_table.all():
+            national_chess_id = player["national_chess_id"]
             name = player["name"]
             surname = player["surname"]
             birthdate = player["birthdate"]
-            score = player["score"]
 
-            player = Player(name, surname, birthdate, score)     
-            player.append(player)
+            player = Player(national_chess_id, name, surname, birthdate)     
+            players.append(player)
+
         return players
 
     def save_json(self):
