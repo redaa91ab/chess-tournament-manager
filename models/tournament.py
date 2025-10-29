@@ -61,14 +61,14 @@ class Tournament:
     
     @classmethod
     def deserialize(cls, tournament_id):
+        """ Return the tournament object of the tournament_id matching"""
         tournaments_list = Tournament.deserialize_all_tournaments()
-        tournament = tournaments_list[tournament_id]
-
+        tournament = next((tournament for tournament in tournaments_list if tournament.tournament_id == tournament_id), None)
         return tournament
 
     def save_json(self):
         """ Save the tournament's details to the tournaments JSON database. """
-    
+        
         if self.tournament_id is None :
             self.tournament_id = self.generate_tournament_id()
             tournament_table.insert(self.serialize())

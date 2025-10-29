@@ -57,19 +57,19 @@ class TournamentsController:
             tournament = self._select_tournament()
             tournament_name = tournament.tournament_name
             self.view.show_add_players_tournament_menu(tournament)
-            user_choice = self.view.get_input("\nChoose an option : ")
 
+
+            user_choice = self.view.get_input("\nChoose an option : ")
             if user_choice == "1" or user_choice == "1)":
                 self.view.show_message(f"\n[bold green]\n{tournament_name}[/bold green]\n")
                 national_chess_id = self.view.get_input("Add a player (National Chess ID) : ")
-                
                 player = Player.deserialize(national_chess_id)
-                
                 if player != None:
                     tournament.players.append([national_chess_id, 0.0])
                     tournament.save_json()
                     self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added !")
-                elif player == None:
+
+                elif player is None:
                     self.view.show_message("\nThis player doesn't exist :\n1) Try again \n2) Create a new player \n")
                     user_choice_option = self.view.get_input("Choose an option : ")
                     if user_choice_option == "1" or user_choice_option == "1)":
@@ -77,15 +77,7 @@ class TournamentsController:
                     elif user_choice_option == "2" or user_choice_option == "2)":
                         name = self.view.get_input("Name : ")
                         surname = self.view.get_input("Surname : ")
-                        while True :
-                            birthdate = self.view.get_input("Birthdate : ")
-                            try:
-                                from datetime import datetime
-                                datetime.strptime(birthdate, "%d/%m/%Y")
-                                break
-                            except ValueError as e:
-                                self.view.show_message(f"Invalid input: {e}")
-                        
+                        birthdate = self._get_valid_date("Birthdate :")
                         Player(national_chess_id, name, surname, birthdate).save_json()
                         tournament.players.append([national_chess_id, 0.0])
                         tournament.save_json()
@@ -121,6 +113,9 @@ class TournamentsController:
                 break
 
     def _select_tournament(self) :
+        """Show the list of all tournaments and the user select
+        Return the tournament object selected """
+
         while True:
             tournaments = Tournament.deserialize_all_tournaments()
             self.view.show_tournaments_list(tournaments)
@@ -132,6 +127,26 @@ class TournamentsController:
                 tournament_index = int(user_input)-1
                 tournament = tournaments[tournament_index]
                 return tournament
+            
+    def _get_valid_number_of_rounds(self) :
+        "return a valid number of rounds (int)"
+        while True :
+            number_of_rounds = self.view.get_input("Number of rounds : ")
+            try:
+                number_of_rounds = int(number_of_rounds)
+                return number_of_rounds
+            except ValueError as e:
+                self.view.show_message(f"Invalid input: {e}")
+
+    def _get_valid_date(self, input) :
+        "return a valid number of rounds (int)"
+        while True :
+            date = self.view.get_input(input)
+            try:
+                datetime.strptime(date, "%d/%m/%Y")
+                return date
+            except ValueError as e:
+                self.view.show_message(f"Invalid input: {e}")
 
 
 class RoundController :
