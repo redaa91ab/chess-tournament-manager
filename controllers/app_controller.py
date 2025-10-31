@@ -78,6 +78,14 @@ class AppController:
             elif user_choice == "3" or user_choice == "3)":
                 break
 
+    
+    def add_player_tournament(self) :
+        
+        while True :
+            self.view.show_add_players_tournament_menu()
+            input = self.view.get_input("\nChoose an option : ")
+            self.tournament.add_player_tournament()
+
 
 
     
