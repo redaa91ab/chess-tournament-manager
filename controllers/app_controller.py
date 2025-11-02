@@ -17,7 +17,7 @@ class AppController:
         Creates a View instance for display and input
         """
         self.view = View()
-        self.players = PlayersController(self.view, self)
+        self.players = PlayersController(self.view)
         self.tournament = TournamentsController(self.view)
 
 
@@ -33,35 +33,17 @@ class AppController:
             self.view.show_main_menu()
             user_choice = self.view.get_input("\nChoose an option : ")
 
-            if user_choice == "1" or user_choice == "1)":
-                self.manage_tournaments()    
-            elif user_choice == "2" or user_choice == "2)":
+            if user_choice in ["1", "1)"] :
+                self.tournament.manage_tournaments()    
+            elif user_choice in ["2", "2)"] :
                 self.manage_players()
-            elif user_choice == "3" or user_choice == "3)":
+            elif user_choice in ["3", "3)"] :
                 pass
-            elif user_choice == "4" or user_choice == "4)":
+            elif user_choice in ["4", "4)"]:
                 break
             else :
-                self.view.show_message("Erreur veuilez réessayer")
-                self.run()
+                self.view.show_message("Please an option between 1 and 4.")
 
-    def manage_tournaments(self):
-        """
-        Display the tournament management menu, collect the user selection and delegates tasks to the TournamentsController
-        for creating tournaments, adding players, playing tournaments, or go back.
-        """
-
-        while True :
-            self.view.show_tournaments_menu()
-            user_choice = self.view.get_input("\nChoose an option : ")
-            if user_choice == "1" or user_choice == "1)":
-                self.tournament.create()
-            elif user_choice == "2" or user_choice == "2)":
-                self.tournament.add_player_tournament()
-            elif user_choice == "3" or user_choice == "3)":
-                self.tournament.play_tournament()
-            elif user_choice == "4" or user_choice == "4)":   
-                break
 
     def manage_players(self):
         """
@@ -77,14 +59,6 @@ class AppController:
                 self.players.add_player()
             elif user_choice == "3" or user_choice == "3)":
                 break
-
-    
-    def add_player_tournament(self) :
-        
-        while True :
-            self.view.show_add_players_tournament_menu()
-            input = self.view.get_input("\nChoose an option : ")
-            self.tournament.add_player_tournament()
 
 
 

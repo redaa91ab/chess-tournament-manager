@@ -8,7 +8,7 @@ class PlayersController:
     It provides methods to display all the players and adding new players to the database
     """
 
-    def __init__(self, view, parent = None):
+    def __init__(self, view):
         """
         Initialize a PlayersController instance.
 
@@ -17,7 +17,6 @@ class PlayersController:
             parent: app_controller.py
         """
         self.view = view
-        self.parent = parent
 
     def display_all_players(self):
         """
@@ -45,6 +44,7 @@ class PlayersController:
             player.save_json()
             self.view.show_message(f"\n{name} {surname} ({national_chess_id}) was successfully added !")
 
+    
     def _get_valid_national_chess_id(self) :
         """Return a correct national chess id"""
 
