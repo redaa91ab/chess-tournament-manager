@@ -55,13 +55,14 @@ class TournamentsController:
             if user_choice == "1" or user_choice == "1)":
                 self.create()
             elif user_choice == "2" or user_choice == "2)":
-                self.add_player_tournament()
+                tournament = self._select_tournament()
+                self.add_player_tournament(tournament)
             elif user_choice == "3" or user_choice == "3)":
                 self.play_tournament()
             elif user_choice == "4" or user_choice == "4)":   
                 break
 
-    def add_player_tournament(self):
+    def add_player_tournament(self, tournament):
         """
         Add players to a tournament in tournaments.json
 
@@ -72,38 +73,31 @@ class TournamentsController:
         Collect the tournament name if not provided and add player to the tournament in tournaments.json.
         If a player doesn't exist, offers the option to create a new player or try again.
         """
+            
+        while True :  
+            self.view.show_add_players_tournament_menu(tournament)
+            user_choice = self.view.get_input("\nChoose an option : ")
+            if user_choice in ["1","1)"]:
+                self._add_single_player_tournament(tournament)
+            elif user_choice in ["2","2)"]:
+                break
 
-
-        while True :
-            tournament = self._select_tournament()
-            tournament_name = tournament.tournament_name
-
-            while True :
-                self.view.show_add_players_tournament_menu(tournament)
-                user_choice = self.view.get_input("\nChoose an option : ")
-
+    def _add_single_player_tournament(self, tournament) :
+        while True : 
+            national_chess_id = self.players_controllers._get_valid_national_chess_id()
+            player = Player.deserialize(national_chess_id)
+            if player != None:
+                tournament.players.append([national_chess_id, 0.0])
+                tournament.save_json()
+                self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added !")
+                break
+            elif player is None:
+                self.view.show_message("\nThis player is not in the database :\n1) Type again \n2) Create a new player \n")
+                user_choice = self.view.get_input("Choose an option : ")
                 if user_choice in ["1","1)"]:
-                    
-                    while True :
-                        self.view.show_message(f"\n[bold green]\n{tournament_name}[/bold green]\n")
-                        national_chess_id = self.players_controllers._get_valid_national_chess_id()
-                        player = Player.deserialize(national_chess_id)
-
-                        while True :
-                            if player != None:
-                                tournament.players.append([national_chess_id, 0.0])
-                                tournament.save_json()
-                                self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added !")
-
-                            elif player is None:
-                                self.view.show_message("\nThis player is not in the database :\n1) Type again \n2) Create a new player \n")
-                                user_choice_option = self.view.get_input("Choose an option : ")
-                                if user_choice_option == "1" or user_choice_option == "1)":
-                                    break
-                                elif user_choice_option == "2" or user_choice_option == "2)":
-                                    PlayersController.add_player(national_chess_id)
-                        
+                    continue
                 elif user_choice in ["2","2)"]:
+                    self.players_controllers.add_player(national_chess_id)
                     break
 
     def play_tournament(self, tournament_id = None):

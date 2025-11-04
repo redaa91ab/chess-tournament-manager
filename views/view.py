@@ -74,8 +74,8 @@ class View:
 
         Shows options for adding new players or going back.
         """
-        (f"[bold green]\n{tournament.tournament_name}[/bold green]")
-        print("\n1) Add new players")
+        print(f"[bold green]\n{tournament.tournament_name}[/bold green]")
+        print("\n1) Add new player")
         print("2)[red] Back[/red]")
 
     def show_play_tournament_menu(self):
