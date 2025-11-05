@@ -1,5 +1,6 @@
 from config import DATA_TOURNAMENTS_PATH
 from tinydb import TinyDB, Query
+from .player import Player
 import uuid 
 db_tournaments = TinyDB(DATA_TOURNAMENTS_PATH)
 tournament_table = db_tournaments.table("tournaments")
@@ -13,8 +14,8 @@ class Tournament:
     retrieve or update tournament information.
     """
 
-    def __init__(self, tournament_name, place, start_date, number_of_rounds = 4, end_date = None, players = [], rounds_list = [],
-                 current_round = {"round_number" : 0, "state" : None}, previous_opponents = None, manager_comment = None, state = "not_started", tournament_id = None):
+    def __init__(self, tournament_name, place, start_date, number_of_rounds = 4, end_date = None, players = [], rounds = [],
+                 current_round = 0, previous_opponents = None, manager_comment = None, state = "not_started", tournament_id = None):
         """
         Initialize a Tournament instance with the provided details.
 
@@ -31,7 +32,7 @@ class Tournament:
         self.number_of_rounds = number_of_rounds
         self.end_date = end_date
         self.players = players
-        self.rounds_list = rounds_list
+        self.rounds = rounds
         self.current_round = current_round
         self.previous_opponents = previous_opponents
         self.manager_comment = manager_comment
@@ -49,8 +50,8 @@ class Tournament:
             "start_date" : self.start_date,
             "number_of_rounds": self.number_of_rounds,
             "end_date": self.end_date,
-            "players": self.players,
-            "rounds_list" : self.rounds_list,
+            "players": [[player[0].national_chess_id, player[1]] for player in self.players],
+            "rounds" : [round.serialize() for round in self.rounds],
             "current_round" : self.current_round,
             "previous_opponents" : self.previous_opponents,
             "manager_comment" : self.manager_comment,
@@ -87,8 +88,8 @@ class Tournament:
             start_date = tournament["start_date"]
             number_of_rounds = tournament["number_of_rounds"]
             end_date = tournament["end_date"]
-            players = tournament["players"]
-            rounds_list = tournament["rounds_list"]
+            players = [[Player.deserialize(player[0]), player[1]] for player in tournament["players"]]
+            rounds = [Round.deserialize(round) for round in tournament["rounds"]]
             current_round = tournament["current_round"]
             previous_opponents = tournament["previous_opponents"]
             manager_comment = tournament["manager_comment"]
@@ -96,13 +97,11 @@ class Tournament:
             tournament_id = tournament["tournament_id"]
 
 
-            tournament = Tournament(tournament_name, place, start_date, number_of_rounds, end_date, players,rounds_list, current_round,
+            tournament = Tournament(tournament_name, place, start_date, number_of_rounds, end_date, players,rounds, current_round,
                                             previous_opponents, manager_comment, state, tournament_id)     
             tournaments.append(tournament)
 
         return tournaments
-
-
 
     @classmethod
     def get_all_tournaments(cls) :
@@ -111,9 +110,7 @@ class Tournament:
         for tournament in tournament_table.all():
                 tournaments[tournament.doc_id] = tournament
         return tournaments
-    
   
-
     @classmethod
     def get_tournament_details(cls, tournament_id):
         """
@@ -169,12 +166,49 @@ class Tournament:
         
 
 class Round :
-    def __init__(self): 
-        pass
+    def __init__(self, name, games_list, state): 
+        self.name = name #ROUND 1, etc...
+        self.games_list = games_list #liste objets games
+        self.state = state
+
+    def serialize(self):
+        serialized_data = {
+            "name" : self.name,
+            "games_list" : self.games_list, #serialiser deserialiser#
+            "state" : self.state
+            } 
+        
+        return serialized_data
+               
+    @classmethod
+    def deserialize(cls, round_serialized):
+        name = round_serialized["name"]
+        games_list = round_serialized["games_list"] #serialiser deserialiser#
+        state = round_serialized["state"]
+
+        round_deserialized = Round(name, games_list, state)
+        return round_deserialized
+
 
     @classmethod
-    def get_last_round(self, tournament_id):
+    def get_last_round(cls, tournament_id):
         tournament_details = Tournament.get_tournament_details(tournament_id)
         rounds_list = tournament_details["rounds_list"]
         return rounds_list[-1]
+    
+
+class Game :
+    def __init__(self, player1 : list[object, float], player2 : list[object, float]):
+        self.player1 = player1
+        self.player2 = player2
+
+    #serialiser deserialiser#
+
+
+
+
+    
+    
+    
+
     

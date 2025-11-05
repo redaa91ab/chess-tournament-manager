@@ -87,7 +87,7 @@ class TournamentsController:
             national_chess_id = self.players_controllers._get_valid_national_chess_id()
             player = Player.deserialize(national_chess_id)
             if player != None:
-                tournament.players.append([national_chess_id, 0.0])
+                tournament.players.append([player, 0.0])
                 tournament.save_json()
                 self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added !")
                 break
@@ -102,28 +102,20 @@ class TournamentsController:
 
     def play_tournament(self, tournament_id = None):
         
-        tournaments = Tournament.get_all_tournaments()
 
         while tournament_id == None :
-            self.view.show_message("\n[bold green]Play tournament[/bold green]\n")
-            self.view.show_tournaments_list(tournaments)
-            user_input = self.view.get_input("Select a tournament: ")
-            if int(user_input) in tournaments :
-                tournament_id = int(user_input)
-            else :
-                self.view.show_message("We didn't find any match, please try again")
+            tournament = self._select_tournament()
 
         while True :
-            tournaments = Tournament.get_all_tournaments()
             self.view.show_play_tournament_menu()
-            user_input = self.view.get_input("\nSelect an option : ")
-            if user_input == "1" or user_input == "1)" :
-                self.round.create_round_menu(tournament_id)
-            elif user_input == "2" or user_input == "2)" :
+            user_choice = self.view.get_input("\nSelect an option : ")
+            if user_choice in ["1","1)"] :
+                self.round.create_round_menu(tournament)
+            elif user_choice in ["2","2)"] :
                 self.round.update_results_games(tournament_id)
-            elif user_input == "3" or user_input == "3)" :
+            elif user_choice in ["3","3)"] :
                 pass
-            elif user_input == "4" or user_input == "4)" :
+            elif user_choice in ["4","4)"] :
                 break
 
     def _select_tournament(self) :
@@ -168,28 +160,28 @@ class RoundController :
     def __init__(self, view):
         self.view = view
 
-    def create_round_menu(self, tournament_id) :
+    def create_round_menu(self, tournament) :
         """
         Display the games of the new round
         """
-
-        tournament_details = Tournament.get_tournament_details(tournament_id)
-        current_round = tournament_details["current_round"]
+        
+        rounds = tournament.rounds
+        current_round = tournament.current_round
+        actual_round = rounds[current_round-1]
 
         while True :
-            if tournament_details["state"] == "not_started" :
-                Tournament.update_element(tournament_id, "state", "in_progress")
-            # Output selon l'etat du round :
-            if current_round["state"] == "in_progress" :
+            if actual_round.state == "in_progress" :
                 self.view.show_message("Please update the current round before to create a new one")
                 break
-            elif current_round["state"] == None or current_round["state"] == "finished"  :
-                new_round = self.generate_round(tournament_id)
-                Tournament.update_element(tournament_id, "current_round", {"round_number": current_round["round_number"] + 1, "state": "in_progress"})
+            else :
+                new_round = self.generate_round(tournament.tournament_id) 
+                tournament.rounds.append(new_round)
+                tournament.current_round += 1
+                tournament.state = "in progress"
+                tournament.save_json()
                 self.view.show_games_list(new_round)
                 break
-        
-
+ 
     def update_results_games(self, tournament_id):
         tournament_details = Tournament.get_tournament_details(tournament_id)
         current_round = tournament_details["current_round"]
@@ -200,8 +192,8 @@ class RoundController :
                 Tournament.update_score(tournament_id, winner)
             Tournament.update_element(tournament_id, "current_round", {"round_number": current_round["round_number"] + 1, "state": "in_progress"})
         else :
-            self.view.show_message("No round to update")
-            
+            self.view.show_message("All rounds are up to date ! Cr")
+
     
     def generate_round(self, tournament_id):
         """
@@ -266,8 +258,37 @@ class RoundController :
     
 
 
+    def create_round_menu_beta(self, tournament_id) :
+        """
+        Display the games of the new round
+        """
+
+        tournament_details = Tournament.get_tournament_details(tournament_id)
+        current_round = tournament_details["current_round"]
+
+        while True :
+            if tournament_details["state"] == "not_started" :
+                Tournament.update_element(tournament_id, "state", "in_progress")
+            # Output selon l'etat du round :
+            if current_round["state"] == "in_progress" :
+                self.view.show_message("Please update the current round before to create a new one")
+                break
+            elif current_round["state"] == None or current_round["state"] == "finished"  :
+                new_round = self.generate_round(tournament_id)
+                Tournament.update_element(tournament_id, "current_round", {"round_number": current_round["round_number"] + 1, "state": "in_progress"})
+                self.view.show_games_list(new_round)
+                break
 
 
-
-
-
+    def update_results_games_beta(self, tournament_id):
+        tournament_details = Tournament.get_tournament_details(tournament_id)
+        current_round = tournament_details["current_round"]
+        if tournament_details["current_round"]["state"] == "in_progress" :
+            last_round = Round.get_last_round(tournament_id)
+            for game in last_round :
+                winner = self.view.update_game_result(game)
+                Tournament.update_score(tournament_id, winner)
+            Tournament.update_element(tournament_id, "current_round", {"round_number": current_round["round_number"] + 1, "state": "in_progress"})
+        else :
+            self.view.show_message("No round to update")
+     
