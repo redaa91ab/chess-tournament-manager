@@ -42,7 +42,8 @@ class PlayersController:
             birthdate = self._get_valid_birthdate()
             player = Player(national_chess_id, name, surname, birthdate)
             player.save_json()
-            self.view.show_message(f"\n{name} {surname} ({national_chess_id}) was successfully added !")
+            self.view.show_message(f"\n{name} {surname} ({national_chess_id}) was successfully added to the database !")
+            return player
 
     
     def _get_valid_national_chess_id(self) :

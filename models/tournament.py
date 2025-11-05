@@ -50,7 +50,7 @@ class Tournament:
             "start_date" : self.start_date,
             "number_of_rounds": self.number_of_rounds,
             "end_date": self.end_date,
-            "players": [[player[0].national_chess_id, player[1]] for player in self.players],
+            "players": [player.national_chess_id for player in self.players],
             "rounds" : [round.serialize() for round in self.rounds],
             "current_round" : self.current_round,
             "previous_opponents" : self.previous_opponents,
@@ -88,7 +88,7 @@ class Tournament:
             start_date = tournament["start_date"]
             number_of_rounds = tournament["number_of_rounds"]
             end_date = tournament["end_date"]
-            players = [[Player.deserialize(player[0]), player[1]] for player in tournament["players"]]
+            players = [Player.deserialize(player) for player in tournament["players"]]
             rounds = [Round.deserialize(round) for round in tournament["rounds"]]
             current_round = tournament["current_round"]
             previous_opponents = tournament["previous_opponents"]
@@ -174,7 +174,7 @@ class Round :
     def serialize(self):
         serialized_data = {
             "name" : self.name,
-            "games_list" : self.games_list, #serialiser deserialiser#
+            "games_list" : [game.serialize() for game in self.games_list], #serialiser deserialiser#
             "state" : self.state
             } 
         
@@ -198,9 +198,27 @@ class Round :
     
 
 class Game :
-    def __init__(self, player1 : list[object, float], player2 : list[object, float]):
+    def __init__(self, player1, score_player1, player2, score_player2):
         self.player1 = player1
+        self.score_player1 = score_player1
         self.player2 = player2
+        self.score_player2 = score_player2
+
+    def serialize(self):
+        serialized_data = {
+            ([self.player1, self.score_player1], [self.player2, self.score_player2])
+        }
+        return serialized_data
+    
+    @classmethod
+    def deserialize(cls, game) :
+        player1 = game.player1
+        score_player1 = game.score_player1
+        player2 = game.player2
+        score_player2 = game.score_player2
+
+        game_deserialized = Round(player1, score_player1, player2, score_player2)
+        return game_deserialized
 
     #serialiser deserialiser#
 

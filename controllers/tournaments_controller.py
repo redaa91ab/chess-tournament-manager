@@ -28,17 +28,8 @@ class TournamentsController:
         self.view.show_message("Enter the new tournament details below : ")
         tournament_name = self.view.get_input("Tournament name : ").upper()
         place = self.view.get_input("Place : ")
-        start_date = self.view.get_input("Start date (DD/MM/YYYY) : ")
-        number_of_rounds = self.view.get_input("Number of rounds : ")
-        
-        try:
-            number_of_rounds = int(number_of_rounds)
-            datetime.strptime(start_date, "%d/%m/%Y")
-
-        except ValueError as e:
-            self.view.show_message(f"Invalid input: {e}")
-            return
-        
+        start_date = self._get_valid_date("Start date (DD/MM/YYYY) : ")
+        number_of_rounds = self._get_valid_number_of_rounds()
         tournament = Tournament(tournament_name, place, start_date, number_of_rounds)
         tournament.save_json()
 
@@ -87,9 +78,9 @@ class TournamentsController:
             national_chess_id = self.players_controllers._get_valid_national_chess_id()
             player = Player.deserialize(national_chess_id)
             if player != None:
-                tournament.players.append([player, 0.0])
+                tournament.players.append(player)
                 tournament.save_json()
-                self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added !")
+                self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added to the tournament !")
                 break
             elif player is None:
                 self.view.show_message("\nThis player is not in the database :\n1) Type again \n2) Create a new player \n")
@@ -97,7 +88,11 @@ class TournamentsController:
                 if user_choice in ["1","1)"]:
                     continue
                 elif user_choice in ["2","2)"]:
-                    self.players_controllers.add_player(national_chess_id)
+                    player = self.players_controllers.add_player(national_chess_id)
+                    tournament.players.append(player)
+                    tournament.save_json()
+                    self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added to the tournament !")
+
                     break
 
     def play_tournament(self, tournament_id = None):
@@ -140,7 +135,10 @@ class TournamentsController:
             number_of_rounds = self.view.get_input("Number of rounds : ")
             try:
                 number_of_rounds = int(number_of_rounds)
-                return number_of_rounds
+                if number_of_rounds > 0:
+                    return number_of_rounds
+                else:
+                    self.view.show_message("Please enter a number greater than 0.")
             except ValueError as e:
                 self.view.show_message(f"Invalid input: {e}")
 
@@ -174,7 +172,8 @@ class RoundController :
                 self.view.show_message("Please update the current round before to create a new one")
                 break
             else :
-                new_round = self.generate_round(tournament.tournament_id) 
+                new_round = self.generate_round(tournament) 
+                #new_rounds should have the "in progres" state
                 tournament.rounds.append(new_round)
                 tournament.current_round += 1
                 tournament.state = "in progress"
@@ -182,20 +181,24 @@ class RoundController :
                 self.view.show_games_list(new_round)
                 break
  
-    def update_results_games(self, tournament_id):
-        tournament_details = Tournament.get_tournament_details(tournament_id)
-        current_round = tournament_details["current_round"]
-        if tournament_details["current_round"]["state"] == "in_progress" :
-            last_round = Round.get_last_round(tournament_id)
-            for game in last_round :
+    def update_results_games(self, tournament):
+    
+        rounds = tournament.rounds
+        current_round = tournament.current_round
+        actual_round = rounds[current_round-1]
+        
+        if actual_round.state == "in_progress" :
+            for game in actual_round.games_list :
                 winner = self.view.update_game_result(game)
-                Tournament.update_score(tournament_id, winner)
-            Tournament.update_element(tournament_id, "current_round", {"round_number": current_round["round_number"] + 1, "state": "in_progress"})
+                #Tournament.update_score(tournament_id, winner)
+                #Tournament.update_element(tournament_id, "current_round", {"round_number": current_round["round_number"] + 1, "state": "in_progress"})
         else :
             self.view.show_message("All rounds are up to date ! Cr")
 
-    
-    def generate_round(self, tournament_id):
+    def generate_round(self, tournament) :
+        pass
+
+    def generate_round_beta(self, tournament_id):
         """
         return a list new round for the tournament, based on actual players, score, and past rounds.
 
