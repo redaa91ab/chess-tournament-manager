@@ -1,4 +1,4 @@
-from models import Tournament, Player, Round, PlayerTournament
+from models import Tournament, Player, Round, Game, PlayerTournament
 from .players_controller import PlayersController
 from datetime import datetime
 
@@ -95,10 +95,10 @@ class TournamentsController:
 
                     break
 
-    def play_tournament(self, tournament_id = None):
+    def play_tournament(self, tournament = None):
         
 
-        while tournament_id == None :
+        while tournament == None :
             tournament = self._select_tournament()
 
         while True :
@@ -107,7 +107,7 @@ class TournamentsController:
             if user_choice in ["1","1)"] :
                 self.round.create_round_menu(tournament)
             elif user_choice in ["2","2)"] :
-                self.round.update_results_games(tournament_id)
+                self.round.update_results_games(tournament)
             elif user_choice in ["3","3)"] :
                 pass
             elif user_choice in ["4","4)"] :
@@ -162,126 +162,76 @@ class RoundController :
         """
         Display the games of the new round
         """
-        
-        rounds = tournament.rounds
-        current_round = tournament.current_round
-        actual_round = rounds[current_round-1]
 
         while True :
-            if actual_round.state == "in_progress" :
-                self.view.show_message("Please update the current round before to create a new one")
-                break
-            else :
-                new_round = self.generate_round(tournament) 
-                #new_rounds should have the "in progres" state
-                tournament.rounds.append(new_round)
-                tournament.current_round += 1
-                tournament.state = "in progress"
-                tournament.save_json()
-                self.view.show_games_list(new_round)
-                break
- 
-    def update_results_games(self, tournament):
+            rounds = tournament.rounds
+            current_round = tournament.current_round
+            if len(rounds) > 0 :
+                actual_round = rounds[current_round-1]
+                if actual_round.state == "in_progress" :
+                    self.view.show_message("Please update the current round before to create a new one")
+                    break
     
-        rounds = tournament.rounds
-        current_round = tournament.current_round
-        actual_round = rounds[current_round-1]
-        
-        if actual_round.state == "in_progress" :
-            for game in actual_round.games_list :
-                winner = self.view.update_game_result(game)
-                #Tournament.update_score(tournament_id, winner)
-                #Tournament.update_element(tournament_id, "current_round", {"round_number": current_round["round_number"] + 1, "state": "in_progress"})
-        else :
-            self.view.show_message("All rounds are up to date ! Cr")
+            round = self.generate_round(tournament) 
+            self.view.show_games_list(round)
+            tournament.rounds.append(round)
+            tournament.current_round += 1
+            tournament.state = "in progress"
+            tournament.save_json()
+            break
+ 
 
     def generate_round(self, tournament) :
-        
-        players = tournament.players
-        #sort them croissant order, 
-        #Soit Round controller fonction qui appelle RoundModel for GamesList
-        #
-        for 
-        for player in tournament.players :
-            tournament.round.get_previous_opponent(player)
-    def generate_round_beta(self, tournament_id):
-        """
-        return a list new round for the tournament, based on actual players, score, and past rounds.
 
-        Args :
-            tournament : The tournament where to generate
-        
-        """
-        
-        
-            
-        tournament_details = Tournament.get_tournament_details(tournament_id)
-        players = tournament_details["players"]
-        players.sort(key=lambda x: x[1])
-        
-        new_round = [] # liste des matchs du round
-        used_players = []
+        games_list = []
+        players = tournament.get_players_sorted()
+        while players :
 
-        for player in players:
-            if player in used_players:
-                continue  # ce joueur est déjà apparié
+            for player in players :
+                players.remove(player)
+                previous_opponents = tournament.get_previous_opponents(player)
+                if len(players) > len(previous_opponents) :
+                    players = [player for player in players if player not in previous_opponents]
+    
+                opponent = players[0]
+                players.remove(opponent)
+                game = Game(player, opponent)
+                games_list.append(game)
+                break
 
-            # chercher un adversaire
-            for opponent in players:
-                if opponent in used_players or opponent == player:
-                    continue
+        round = Round(f"ROUND {tournament.current_round+1}", games_list, "in_progress" )    
+        return round
 
-                if have_played_before(player, opponent, tournament_details["rounds_list"]):
-                    continue
-                
-                else :
-                    new_round.append((player, opponent))
-                    used_players.extend([player, opponent])
-                    break # on passe au joueur suivant
+    def update_results_games(self, tournament):
+    
+        while True :
+            rounds = tournament.rounds
+            current_round = tournament.current_round
 
-            if player not in used_players :
-                for opponent in players:
-                    if opponent not in used_players and opponent != player:
-                        new_round.append((player, opponent))
-                        used_players.extend([player, opponent])
+            if len(rounds) == 0 :
+                self.view.show_message("Please create a round before to update")
+                break
+            else :
+                actual_round = rounds[current_round-1]
+                if actual_round.state == "finished" :
+                    self.view.show_message("The round is already updated, please create a new one")
+                    break
+                elif actual_round.state == "in_progress" :
+                    for game in actual_round.games_list :
+                        winner = self.view.update_game_result(game)
+                        game.winner.score += 1
+                        tournament.rounds.append(round)
+                        tournament.current_round += 1
+                        tournament.state = "in progress"
+                        tournament.save_json()
                         break
 
-        Tournament.update_element(tournament_id, "rounds_list", new_round )
-        return new_round
-    
 
-
-    def create_round_menu_beta(self, tournament_id) :
-        """
-        Display the games of the new round
-        """
-
-        tournament_details = Tournament.get_tournament_details(tournament_id)
-        current_round = tournament_details["current_round"]
-
-        while True :
-            if tournament_details["state"] == "not_started" :
-                Tournament.update_element(tournament_id, "state", "in_progress")
-            # Output selon l'etat du round :
-            if current_round["state"] == "in_progress" :
-                self.view.show_message("Please update the current round before to create a new one")
-                break
-            elif current_round["state"] == None or current_round["state"] == "finished"  :
-                new_round = self.generate_round(tournament_id)
-                Tournament.update_element(tournament_id, "current_round", {"round_number": current_round["round_number"] + 1, "state": "in_progress"})
-                self.view.show_games_list(new_round)
-                break
-
-
-    def update_results_games_beta(self, tournament_id):
-        tournament_details = Tournament.get_tournament_details(tournament_id)
-        current_round = tournament_details["current_round"]
-        if tournament_details["current_round"]["state"] == "in_progress" :
-            last_round = Round.get_last_round(tournament_id)
-            for game in last_round :
-                winner = self.view.update_game_result(game)
-                Tournament.update_score(tournament_id, winner)
-            Tournament.update_element(tournament_id, "current_round", {"round_number": current_round["round_number"] + 1, "state": "in_progress"})
-        else :
-            self.view.show_message("No round to update")
-     
+            
+                    round = self.generate_round(tournament) 
+                    self.view.show_games_list(round)
+                    tournament.rounds.append(round)
+                    tournament.current_round += 1
+                    tournament.state = "in progress"
+                    tournament.save_json()
+                    break

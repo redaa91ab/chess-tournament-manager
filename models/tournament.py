@@ -86,7 +86,7 @@ class Tournament:
             start_date = tournament["start_date"]
             number_of_rounds = tournament["number_of_rounds"]
             end_date = tournament["end_date"]
-            players = [Player.deserialize(player) for player in tournament["players"]]
+            players = [PlayerTournament.deserialize(player) for player in tournament["players"]]
             rounds = [Round.deserialize(round) for round in tournament["rounds"]]
             current_round = tournament["current_round"]
             manager_comment = tournament["manager_comment"]
@@ -95,79 +95,26 @@ class Tournament:
 
 
             tournament = Tournament(tournament_name, place, start_date, number_of_rounds, end_date, players,rounds, current_round,
-                                            previous_opponents, manager_comment, state, tournament_id)     
+                                    manager_comment, state, tournament_id)     
             tournaments.append(tournament)
 
         return tournaments
     
     def get_players_sorted(self):
-
         players_list = self.players
         players_list_sorted = sorted(players_list, key=lambda player: player.score)
-        return players_list
-         
+        return players_list_sorted
+    
 
-    @classmethod
-    def get_all_tournaments(cls) :
-        """ return a dict of all tournament """
-        tournaments = {}
-        for tournament in tournament_table.all():
-                tournaments[tournament.doc_id] = tournament
-        return tournaments
-  
-    @classmethod
-    def get_tournament_details(cls, tournament_id):
-        """
-        Retrieve details of a tournament by its name from the JSON database.
+    def get_previous_opponents(self, player):
+        previous_opponents = []
 
-        Args:
-            tournament_name : The name of the tournament to retrieve.
+        for round in self.rounds :
+            previous_opponents_round = round.get_previous_opponents_round(player)
+            previous_opponents.append(previous_opponents_round)
 
-        Returns:
-            list or None: A list containing the tournament's details or None.
-        """
-        tournament = tournament_table.get(doc_id=int(tournament_id))
-
-        if tournament:
-            return tournament
-        else:
-            return None
-        
-    @classmethod
-    def update_element(cls, tournament_id, element_to_update, new_element) :
-        """
-        If the data to update is something to add
-        elif it's the whole element to remplace
-        """
-        if element_to_update == "rounds_list" or element_to_update == "players" :#2 WAYS players = add or change  
-        
-            tournament = tournament_table.get(doc_id=int(tournament_id))
-            data = tournament.get(element_to_update) or []  # if == None return []
-            data.append(new_element)
-            tournament_table.update({element_to_update: data}, doc_ids=[int(tournament_id)])
-        else :
-            tournament_table.update({element_to_update: new_element}, doc_ids=[tournament_id])
-
-    @classmethod
-    def update_score(cls, tournament_id, winner_nid) :
-        """
-        If the data to update is something to add
-        elif it's the whole element to remplace
-        """
-        tournament = tournament_table.get(doc_id=int(tournament_id))
-        players = tournament.get("players")
-        print(players)
-        new_players = []
-        for player in players :
-            print(player)
-            if player[0] == winner_nid :
-                player_updated = [player[0], player[1]+1]
-                new_players.append(player_updated)
-            else :
-                new_players.append(player)
-        
-        tournament_table.update({"players": new_players}, doc_ids=[tournament_id])
-        
+        return previous_opponents
+    
 
 class Round :
     def __init__(self, name, games_list, state): 
@@ -194,21 +141,15 @@ class Round :
         return round_deserialized
     
 
-    def get_previous_opponents(self, player):
+    def get_previous_opponents_round(self, player):
+
         previous_opponents = []
         for game in self.games_list :
-            if game.player1 == player :
-                previous_opponents.append(game.player2)
-            elif game.player2 == player :
-                previous_opponents.append(game.player1)
+                if game.player1 == player :
+                    previous_opponents.append(game.player2)
+                elif game.player2 == player :
+                    previous_opponents.append(game.player1)
         return previous_opponents
-
-
-    @classmethod
-    def get_last_round(cls, tournament_id):
-        tournament_details = Tournament.get_tournament_details(tournament_id)
-        rounds_list = tournament_details["rounds_list"]
-        return rounds_list[-1]
     
 
 class Game :

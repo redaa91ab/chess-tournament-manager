@@ -101,21 +101,40 @@ class View:
 
     def show_games_list(self, round):
         print("[bold green]\nGames\n[/bold green]")
+
+        """
         for i,game in enumerate(round,1) :
             player1 = game[0][0]
             player2 = game[1][0]
             print(f"{i}. {player1} vs {player2}")
+        """
+
+        games_list = round.games_list
+        for i, game in enumerate(games_list, 1) :
+            player1 = game.player1.player
+            player2 = game.player2.player
+            print(f"{i}) {player1.name} ({player1.national_chess_id}) vs {player2.name} ({player2.national_chess_id})")
 
     
     def update_game_result(self, game) :
         """return the winner of the game"""
         print("[bold green]\nUpdate actual round\n[/bold green]")
-        player1 = game[0][0]
-        player2 = game[1][0]
-        print(f"{player1} vs {player2}")
-        return input(f"\n Enter the national chess ID of the winner :")
-        #save a chaque iteration
-        #or 
+        player1 = game.player1
+        player2 = game.player2
+
+        while True :
+            for i, player in enumerate(game, 1) :
+                print(f"{i}) {player.player.name} ({player.player.national_chess_id})")
+        
+            user_choice = input(f"\n Enter the number of the winner (1 or 2) :")
+            if user_choice == 1 :
+                return player1
+            elif user_choice == 2 :
+                return player2
+            else :
+                print("Please choose a player between 1 or 2")
+
+
 
 
 

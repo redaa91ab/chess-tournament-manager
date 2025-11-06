@@ -5,4 +5,4 @@ and tournaments.
 """
 
 from .player import Player
-from .tournament import Tournament, Round, PlayerTournament
+from .tournament import Tournament, Round, Game, PlayerTournament
