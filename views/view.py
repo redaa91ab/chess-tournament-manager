@@ -118,21 +118,26 @@ class View:
     
     def update_game_result(self, game) :
         """return the winner of the game"""
-        print("[bold green]\nUpdate actual round\n[/bold green]")
+        print("[bold green]\nUpdate game\n[/bold green]")
         player1 = game.player1
         player2 = game.player2
 
         while True :
-            for i, player in enumerate(game, 1) :
-                print(f"{i}) {player.player.name} ({player.player.national_chess_id})")
+            print(f"{1}) {player1.player.name} ({player1.player.national_chess_id})")
+            print("VS")
+            print(f"{2}) {player2.player.name} ({player2.player.national_chess_id})")
+            print("")
+            print("3) Draw")
         
-            user_choice = input(f"\n Enter the number of the winner (1 or 2) :")
+            user_choice = int(input(f"\n Enter the number of the winner (1 or 2) or draw (2) :"))
             if user_choice == 1 :
                 return player1
             elif user_choice == 2 :
                 return player2
+            elif user_choice == 3 :
+                return None
             else :
-                print("Please choose a player between 1 or 2")
+                print("Please choose a choice between 1 and 3")
 
 
 

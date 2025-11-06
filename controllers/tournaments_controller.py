@@ -120,7 +120,7 @@ class TournamentsController:
         while True:
             tournaments = Tournament.deserialize_all_tournaments()
             self.view.show_tournaments_list(tournaments)
-            user_input = self.view.get_input("\nSelect a tournament :")
+            user_input = self.view.get_input("\nSelect a tournament : ")
 
             if int(user_input) > len(tournaments):
                 self.view.show_message("No tournament was find with that ID. Please try again.")
@@ -172,7 +172,7 @@ class RoundController :
                     self.view.show_message("Please update the current round before to create a new one")
                     break
     
-            round = self.generate_round(tournament) 
+            round = self.generate_round(tournament)
             self.view.show_games_list(round)
             tournament.rounds.append(round)
             tournament.current_round += 1
@@ -192,7 +192,6 @@ class RoundController :
                 previous_opponents = tournament.get_previous_opponents(player)
                 if len(players) > len(previous_opponents) :
                     players = [player for player in players if player not in previous_opponents]
-    
                 opponent = players[0]
                 players.remove(opponent)
                 game = Game(player, opponent)
@@ -219,15 +218,20 @@ class RoundController :
                 elif actual_round.state == "in_progress" :
                     for game in actual_round.games_list :
                         winner = self.view.update_game_result(game)
-                        game.winner.score += 1
-                        tournament.rounds.append(round)
-                        tournament.current_round += 1
-                        tournament.state = "in progress"
-                        tournament.save_json()
-                        break
+                        if winner == game.player1 :
+                                game.player1.score +=1
+                        elif winner == game.player2 :
+                                game.player2.score +=1
+                        elif winner == None :
+                            game.player1.score +=0.5
+                            game.player2.score +=0.5
+
+                    actual_round.state = "finished"
+                    tournament.save_json()
+                    break
 
 
-            
+            """
                     round = self.generate_round(tournament) 
                     self.view.show_games_list(round)
                     tournament.rounds.append(round)
@@ -235,3 +239,4 @@ class RoundController :
                     tournament.state = "in progress"
                     tournament.save_json()
                     break
+            """
