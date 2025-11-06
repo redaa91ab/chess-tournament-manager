@@ -174,7 +174,7 @@ class Round :
     def serialize(self):
         serialized_data = {
             "name" : self.name,
-            "games_list" : [game.serialize() for game in self.games_list], #serialiser deserialiser#
+            "games_list" : [game.serialize() for game in self.games_list], 
             "state" : self.state
             } 
         
@@ -183,11 +183,22 @@ class Round :
     @classmethod
     def deserialize(cls, round_serialized):
         name = round_serialized["name"]
-        games_list = round_serialized["games_list"] #serialiser deserialiser#
+        games_list = round_serialized["games_list"]
         state = round_serialized["state"]
 
         round_deserialized = Round(name, games_list, state)
         return round_deserialized
+    
+
+    def get_previous_opponents(self, player):
+        previous_opponents = []
+        for game in self.games_list :
+            if game.player1 == player :
+                previous_opponents.append(game.player2)
+            elif game.player2 == player :
+                previous_opponents.append(game.player1)
+            
+
 
 
     @classmethod
@@ -220,7 +231,6 @@ class Game :
         game_deserialized = Round(player1, score_player1, player2, score_player2)
         return game_deserialized
 
-    #serialiser deserialiser#
 
 
 
