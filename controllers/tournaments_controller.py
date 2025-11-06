@@ -1,4 +1,4 @@
-from models import Tournament, Player, Round
+from models import Tournament, Player, Round, PlayerTournament
 from .players_controller import PlayersController
 from datetime import datetime
 
@@ -78,7 +78,7 @@ class TournamentsController:
             national_chess_id = self.players_controllers._get_valid_national_chess_id()
             player = Player.deserialize(national_chess_id)
             if player != None:
-                tournament.players.append(player)
+                tournament.players.append(PlayerTournament(player, 0.0))
                 tournament.save_json()
                 self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added to the tournament !")
                 break
@@ -89,7 +89,7 @@ class TournamentsController:
                     continue
                 elif user_choice in ["2","2)"]:
                     player = self.players_controllers.add_player(national_chess_id)
-                    tournament.players.append(player)
+                    tournament.players.append(PlayerTournament(player, 0.0))
                     tournament.save_json()
                     self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added to the tournament !")
 
@@ -196,8 +196,14 @@ class RoundController :
             self.view.show_message("All rounds are up to date ! Cr")
 
     def generate_round(self, tournament) :
-        pass
-
+        
+        players = tournament.players
+        #sort them croissant order, 
+        #Soit Round controller fonction qui appelle RoundModel for GamesList
+        #
+        for 
+        for player in tournament.players :
+            tournament.round.get_previous_opponent(player)
     def generate_round_beta(self, tournament_id):
         """
         return a list new round for the tournament, based on actual players, score, and past rounds.
@@ -207,23 +213,7 @@ class RoundController :
         
         """
         
-        def have_played_before(p1, p2, past_rounds):
-            """
-            return True if the two players have played in the past rounds on this tournament
-            else return False 
-
-            Args : 
-                p1 and p2 : The two players
-                past_rounds : The past rounds of the tournament
         
-            """
-            p1 = p1[0]
-            p2 = p2[0]
-            for rnd in past_rounds:
-                for match in rnd:
-                    if (p1 == match[0][0] and p2 == match[1][0]) or (p1 == match[1][0] and p2 == match[0][0]):
-                        return True
-            return False
             
         tournament_details = Tournament.get_tournament_details(tournament_id)
         players = tournament_details["players"]
