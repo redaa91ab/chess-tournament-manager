@@ -47,9 +47,12 @@ class TournamentsController:
                 self.create()
             elif user_choice == "2" or user_choice == "2)":
                 tournament = self._select_tournament()
-                self.add_player_tournament(tournament)
+                if tournament :
+                    self.add_player_tournament(tournament)
             elif user_choice == "3" or user_choice == "3)":
-                self.play_tournament()
+                tournament = self._select_tournament()
+                if tournament :
+                    self.play_tournament(tournament)
             elif user_choice == "4" or user_choice == "4)":   
                 break
 
@@ -95,11 +98,7 @@ class TournamentsController:
 
                     break
 
-    def play_tournament(self, tournament = None):
-        
-
-        while tournament == None :
-            tournament = self._select_tournament()
+    def play_tournament(self, tournament):
 
         while True :
             self.view.show_play_tournament_menu()
@@ -109,9 +108,43 @@ class TournamentsController:
             elif user_choice in ["2","2)"] :
                 self.round.update_results_games(tournament)
             elif user_choice in ["3","3)"] :
-                pass
+                self.finish_tournament(tournament)
             elif user_choice in ["4","4)"] :
                 break
+
+        
+    def finish_tournament(self, tournament) :
+
+        while True :
+
+            rounds = tournament.rounds
+            current_round = tournament.current_round
+            actual_round = rounds[current_round-1]
+
+            if tournament.current_round < tournament.number_of_rounds :
+                self.view.show_message(f"\nThis tournament should last {tournament.number_of_rounds} rounds\n1) Finish the tournament earlier \n2) Back \n")
+                user_choice = int(self.view.get_input("\nSelect an option : "))
+                if user_choice == 1 :
+                    continue
+                elif user_choice == 1 :
+                    break
+            if actual_round.state == "in_progress" :
+                self.view.show_message(f"\nPlease update the last round results before to finish the tournament")
+                break
+            elif actual_round.state == "finished" :
+                self.view.show_message(f"\nWARNING : The tournament will no longer be modifiable . Do you want to finish the tournament ?\n1) Finish the tournament anyway \n2) Back\n")
+                user_choice = int(self.view.get_input("\nSelect an option : "))
+                if user_choice == 1 :
+                    tournament.state = "finished"
+                    tournament.save_json()
+                    self.view.show_message(f"\nThe tournament is now finish. You can view the reports on the menu \"Tournament reports\" ")
+                    break
+                elif user_choice == 2 :
+                    break
+
+
+
+
 
     def _select_tournament(self) :
         """Show the list of all tournaments and the user select
@@ -127,7 +160,11 @@ class TournamentsController:
             else:
                 tournament_index = int(user_input)-1
                 tournament = tournaments[tournament_index]
-                return tournament
+                if tournament.state == "finished" :
+                    self.view.show_message(f"\nThis tournament is finished. You can view the reports on the menu \"Tournament reports\" ")
+                    break
+                else :
+                    return tournament
             
     def _get_valid_number_of_rounds(self) :
         "return a valid number of rounds (int)"
@@ -229,14 +266,3 @@ class RoundController :
                     actual_round.state = "finished"
                     tournament.save_json()
                     break
-
-
-            """
-                    round = self.generate_round(tournament) 
-                    self.view.show_games_list(round)
-                    tournament.rounds.append(round)
-                    tournament.current_round += 1
-                    tournament.state = "in progress"
-                    tournament.save_json()
-                    break
-            """
