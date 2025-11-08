@@ -53,7 +53,7 @@ class View:
         print("\n[bold green]Manage tournaments[/bold green]\n")
         print("1) Create a tournament")
         print("2) Add players to a tournament")
-        print("3) Play a tournament")
+        print("3) Start a tournament")
         print("4)[red] Back [/red]")
 
     def show_manage_players_menu(self):
@@ -78,13 +78,13 @@ class View:
         print("\n1) Add new player")
         print("2)[red] Back[/red]")
 
-    def show_play_tournament_menu(self):
+    def show_start_tournament_menu(self):
         """
-        Display the play tournament menu
+        Display the start tournament menu
 
         Show options
         """
-        print("[bold green]\nPlay Tournament[/bold green]")
+        print("[bold green]\Start Tournament[/bold green]")
         print("\n1) Create a new round ")
         print("2) Update the actual round")
         print("3) Finish the tournament")
@@ -98,6 +98,7 @@ class View:
             start_date = tournament.start_date
             state = tournament.state
             console.print(f"[bold cyan]{i}.[/] {tournament_name} ({start_date}) | [yellow]{state}[/]")
+        console.print(f"{len(tournaments)+1}.[red] Back[/red]")
 
     def show_games_list(self, round):
         print("[bold green]\nGames\n[/bold green]")

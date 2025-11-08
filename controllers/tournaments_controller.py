@@ -20,20 +20,6 @@ class TournamentsController:
         self.players_controllers = PlayersController(self.view)
         self.round = RoundController(self.view)
 
-    def create(self):
-        """
-        Collect new tournament details and save it in tournaments.json by using the methods save_json of the model Tournament
-        """
-        self.view.show_message("\n[bold green]Create tournament[/bold green]\n")
-        self.view.show_message("Enter the new tournament details below : ")
-        tournament_name = self.view.get_input("Tournament name : ").upper()
-        place = self.view.get_input("Place : ")
-        start_date = self._get_valid_date("Start date (DD/MM/YYYY) : ")
-        number_of_rounds = self._get_valid_number_of_rounds()
-        tournament = Tournament(tournament_name, place, start_date, number_of_rounds)
-        tournament.save_json()
-
-
     def manage_tournaments(self):
         """
         Display the tournament management menu, collect the user selection and delegates tasks to the TournamentsController
@@ -48,13 +34,38 @@ class TournamentsController:
             elif user_choice == "2" or user_choice == "2)":
                 tournament = self._select_tournament()
                 if tournament :
-                    self.add_player_tournament(tournament)
+                    if tournament.state == "finished" :
+                        self.view.show_message("This tournament is finished. You can't add players.")
+                    else :
+                        self.add_player_tournament(tournament)
             elif user_choice == "3" or user_choice == "3)":
                 tournament = self._select_tournament()
                 if tournament :
-                    self.play_tournament(tournament)
+                    if tournament.state == "finished" :
+                        self.view.show_message("This tournament is finished. You can't start a tournament.")
+                    elif len(tournament.players) < 4 :
+                        self.view_show_message(f"You need at least 4 players to start a tournament.  Current number of players = {len(tournament.players)}")
+                    elif len(tournament.players) %2 != 0 :
+                        self.view_show_message(f"You need to a even number of players to start. Current number of players = {len(tournament.players)}")
+                    else :
+                        self.start_tournament(tournament)
             elif user_choice == "4" or user_choice == "4)":   
                 break
+
+
+    def create(self):
+        """
+        Collect new tournament details and save it in tournaments.json by using the methods save_json of the model Tournament
+        """
+        self.view.show_message("\n[bold green]Create tournament[/bold green]\n")
+        self.view.show_message("Enter the new tournament details below : ")
+        tournament_name = self.view.get_input("Tournament name : ").upper()
+        place = self.view.get_input("Place : ")
+        start_date = self._get_valid_date("Start date (DD/MM/YYYY) : ")
+        number_of_rounds = self._get_valid_number_of_rounds()
+        tournament = Tournament(tournament_name, place, start_date, number_of_rounds)
+        tournament.save_json()
+
 
     def add_player_tournament(self, tournament):
         """
@@ -98,10 +109,10 @@ class TournamentsController:
 
                     break
 
-    def play_tournament(self, tournament):
+    def start_tournament(self, tournament):
 
         while True :
-            self.view.show_play_tournament_menu()
+            self.view.show_start_tournament_menu()
             user_choice = self.view.get_input("\nSelect an option : ")
             if user_choice in ["1","1)"] :
                 self.round.create_round_menu(tournament)
@@ -143,9 +154,6 @@ class TournamentsController:
                     break
 
 
-
-
-
     def _select_tournament(self) :
         """Show the list of all tournaments and the user select
         Return the tournament object selected """
@@ -153,18 +161,16 @@ class TournamentsController:
         while True:
             tournaments = Tournament.deserialize_all_tournaments()
             self.view.show_tournaments_list(tournaments)
-            user_input = self.view.get_input("\nSelect a tournament : ")
+            user_input = int(self.view.get_input("\nSelect a tournament : "))
 
-            if int(user_input) > len(tournaments):
+            if user_input == len(tournaments)+1:
+                break
+            elif user_input > len(tournaments)+1:
                 self.view.show_message("No tournament was find with that ID. Please try again.")
             else:
-                tournament_index = int(user_input)-1
+                tournament_index = user_input-1
                 tournament = tournaments[tournament_index]
-                if tournament.state == "finished" :
-                    self.view.show_message(f"\nThis tournament is finished. You can view the reports on the menu \"Tournament reports\" ")
-                    break
-                else :
-                    return tournament
+                return tournament
             
     def _get_valid_number_of_rounds(self) :
         "return a valid number of rounds (int)"
