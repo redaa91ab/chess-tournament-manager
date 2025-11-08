@@ -129,7 +129,7 @@ class View:
             print("")
             print("3) Draw")
         
-            user_choice = int(input(f"\n Enter the number of the winner (1 or 2) or draw (2) :"))
+            user_choice = int(input(f"\n Enter the number of the winner (1 or 2) or draw (3) :"))
             if user_choice == 1 :
                 return player1
             elif user_choice == 2 :

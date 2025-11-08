@@ -18,6 +18,22 @@ class PlayersController:
         """
         self.view = view
 
+
+    def manage_players(self):
+        """
+        Display the player management menu, collect the user selection and delegates tasks to the PlayersController for
+        listing or adding players, or go back.
+        """
+        while True :
+            self.view.show_manage_players_menu()
+            user_choice = self.view.get_input("\nChoose an option : ")
+            if user_choice == "1" or user_choice == "1)":
+                self.display_all_players()
+            elif user_choice == "2" or user_choice == "2)":
+                self.add_player()
+            elif user_choice == "3" or user_choice == "3)":
+                break
+
     def display_all_players(self):
         """
         Display the list of all players using the method return_players of the Player model.
