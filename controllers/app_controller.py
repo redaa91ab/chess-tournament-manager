@@ -37,7 +37,7 @@ class AppController:
             elif user_choice in ["2", "2)"] :
                 self.players.manage_players()
             elif user_choice in ["3", "3)"] :
-                pass
+                self.tournament.reports_menu()
             elif user_choice in ["4", "4)"]:
                 break
             else :

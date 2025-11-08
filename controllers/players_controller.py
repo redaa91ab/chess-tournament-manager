@@ -38,10 +38,11 @@ class PlayersController:
         """
         Display the list of all players using the method return_players of the Player model.
         """
-        self.view.show_message(Player.get_all_players())
+        players = Player.deserialize_all_players()
+        self.view.display_all_players(players)
 
     def add_player(self, national_chess_id = None) :
-        """ 
+        """
         Collect the player details, then use the methods save_json of the Player model.
         """
 

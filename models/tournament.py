@@ -2,7 +2,7 @@ from config import DATA_TOURNAMENTS_PATH
 from tinydb import TinyDB, Query
 from .player import Player
 import uuid 
-db_tournaments = TinyDB(DATA_TOURNAMENTS_PATH)
+db_tournaments = TinyDB("data/tournaments.json")
 tournament_table = db_tournaments.table("tournaments")
 
 class Tournament:
@@ -57,13 +57,6 @@ class Tournament:
             "tournament_id": self.tournament_id
         }
         return serialized_data
-    
-    @classmethod
-    def deserialize(cls, tournament_id):
-        """ Return the tournament object of the tournament_id matching"""
-        tournaments_list = Tournament.deserialize_all_tournaments()
-        tournament = next((tournament for tournament in tournaments_list if tournament.tournament_id == tournament_id), None)
-        return tournament
 
     def save_json(self):
         """ Save the tournament's details to the tournaments JSON database. """

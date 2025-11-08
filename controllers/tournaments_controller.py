@@ -52,6 +52,17 @@ class TournamentsController:
             elif user_choice == "4" or user_choice == "4)":   
                 break
 
+    def reports_menu(self) :
+        while True :
+            self.view.reports_menu()
+            user_choice = int(self.view.get_input("\nChoose an option : "))
+            if user_choice == 1 :
+                self.players_controllers.display_all_players()
+            elif user_choice == 2 :
+                pass
+            elif user_choice == 3 :
+                break
+
 
     def create(self):
         """
@@ -127,18 +138,20 @@ class TournamentsController:
     def finish_tournament(self, tournament) :
 
         while True :
-
             rounds = tournament.rounds
             current_round = tournament.current_round
             actual_round = rounds[current_round-1]
 
             if tournament.current_round < tournament.number_of_rounds :
-                self.view.show_message(f"\nThis tournament should last {tournament.number_of_rounds} rounds\n1) Finish the tournament earlier \n2) Back \n")
+                self.view.show_message(f"\nThis tournament should last {tournament.number_of_rounds} rounds\n1) Finish the tournament earlier \n2)[red] Back [/red] \n")
                 user_choice = int(self.view.get_input("\nSelect an option : "))
                 if user_choice == 1 :
-                    continue
-                elif user_choice == 1 :
+                    pass
+                elif user_choice == 2 :
                     break
+                else :
+                    self.view.show_message("Please select an option between 1 and 2")
+                    continue
             if actual_round.state == "in_progress" :
                 self.view.show_message(f"\nPlease update the last round results before to finish the tournament")
                 break
@@ -194,7 +207,6 @@ class TournamentsController:
                 return date
             except ValueError as e:
                 self.view.show_message(f"Invalid input: {e}")
-
 
 class RoundController :
     
