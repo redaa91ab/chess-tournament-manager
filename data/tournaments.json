@@ -1,1 +1,147 @@
-{"tournaments": {"1": {"tournament_name": "PARIS 2027", "place": "PLACE DITALIE", "start_date": "20/02/2029", "number_of_rounds": 4, "end_date": null, "players": [["AB00001", 3.5], ["AB00002", 1.5], ["AB00003", 1.5], ["AB00004", 1.5]], "rounds": [{"name": "ROUND 1", "games_list": [[["AB00001", 2.0], ["AB00002", 1.0]], [["AB00003", 0.0], ["AB00004", 1.0]]], "state": "finished"}, {"name": "ROUND 2", "games_list": [[["AB00002", 1.0], ["AB00003", 0.0]], [["AB00001", 2.0], ["AB00004", 1.0]]], "state": "finished"}, {"name": "ROUND 3", "games_list": [[["AB00003", 1.5], ["AB00002", 1.5]], [["AB00004", 1.5], ["AB00001", 3.5]]], "state": "finished"}, {"name": "ROUND 4", "games_list": [[["AB00002", 1.5], ["AB00003", 1.5]], [["AB00004", 1.5], ["AB00001", 3.5]]], "state": "finished"}], "current_round": 4, "manager_comment": null, "state": "finished", "tournament_id": "7dbc7699-44fb-4616-bcbd-4a9f6736f266"}, "2": {"tournament_name": "MARSEILLE SENIORS", "place": "MARSEILLE", "start_date": "20/02/2018", "number_of_rounds": 4, "end_date": null, "players": [["AB00001", 1.0], ["AB00093", 0.0], ["AB00002", 0.5], ["AB00004", 0.5]], "rounds": [{"name": "ROUND 1", "games_list": [[["AB00001", 1.0], ["AB00093", 0.0]], [["AB00002", 0.5], ["AB00004", 0.5]]], "state": "finished"}], "current_round": 1, "manager_comment": null, "state": "in progress", "tournament_id": "8aae0a44-4bb7-484d-b8ae-d3a2edd5a34e"}}}
+{
+    "tournaments": {
+        "1": {
+            "tournament_name": "EVRY 2025",
+            "place": "LAGORA",
+            "start_date": "20/02/2025",
+            "end_date": "21/02/2025",
+            "number_of_rounds": 4,
+            "current_round": 4,
+            "players": [
+                [
+                    "AB00001",
+                    5.5
+                ],
+                [
+                    "AB00002",
+                    5.5
+                ],
+                [
+                    "AB00003",
+                    4.5
+                ],
+                [
+                    "AB00004",
+                    12.5
+                ]
+            ],
+            "rounds": [
+                {
+                    "name": "ROUND 1",
+                    "games_list": [
+                        [
+                            [
+                                "AB00001",
+                                1.0
+                            ],
+                            [
+                                "AB00002",
+                                0.0
+                            ]
+                        ],
+                        [
+                            [
+                                "AB00003",
+                                0.0
+                            ],
+                            [
+                                "AB00004",
+                                1.0
+                            ]
+                        ]
+                    ],
+                    "state": "finished",
+                    "start_date": "10/11/2025 13:22:40",
+                    "end_date": "10/11/2025 13:23:02"
+                },
+                {
+                    "name": "ROUND 2",
+                    "games_list": [
+                        [
+                            [
+                                "AB00002",
+                                2.0
+                            ],
+                            [
+                                "AB00003",
+                                2.0
+                            ]
+                        ],
+                        [
+                            [
+                                "AB00001",
+                                2.5
+                            ],
+                            [
+                                "AB00004",
+                                5.5
+                            ]
+                        ]
+                    ],
+                    "state": "finished",
+                    "start_date": "10/11/2025 13:27:05",
+                    "end_date": "10/11/2025 13:27:13"
+                },
+                {
+                    "name": "ROUND 3",
+                    "games_list": [
+                        [
+                            [
+                                "AB00001",
+                                4.5
+                            ],
+                            [
+                                "AB00002",
+                                5.0
+                            ]
+                        ],
+                        [
+                            [
+                                "AB00003",
+                                4.5
+                            ],
+                            [
+                                "AB00004",
+                                12.0
+                            ]
+                        ]
+                    ],
+                    "state": "finished",
+                    "start_date": "10/11/2025 13:36:23",
+                    "end_date": "10/11/2025 13:36:25"
+                },
+                {
+                    "name": "ROUND 4",
+                    "games_list": [
+                        [
+                            [
+                                "AB00001",
+                                5.5
+                            ],
+                            [
+                                "AB00003",
+                                4.5
+                            ]
+                        ],
+                        [
+                            [
+                                "AB00002",
+                                5.5
+                            ],
+                            [
+                                "AB00004",
+                                12.5
+                            ]
+                        ]
+                    ],
+                    "state": "finished",
+                    "start_date": "10/11/2025 13:38:35",
+                    "end_date": "10/11/2025 13:38:38"
+                }
+            ],
+            "manager_comment": null,
+            "state": "finished",
+            "tournament_id": "365f53df-3ba7-4530-a0d8-f74669d90ca3"
+        }
+    }
+}

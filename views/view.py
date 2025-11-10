@@ -1,4 +1,5 @@
 from rich.console import Console
+from rich.tree import Tree
 from rich.table import Table
 console = Console()
 
@@ -29,7 +30,7 @@ class View:
         Args:
             message : The message to display.
         """
-        print(message)
+        console.print(message)
 
     def show_main_menu(self):
         """
@@ -85,30 +86,27 @@ class View:
 
         Show options
         """
-        console.print("[bold green]\Start Tournament[/bold green]")
+        console.print("[bold green]\nStart Tournament[/bold green]")
         console.print("\n1) Create a new round ")
         console.print("2) Update the actual round")
         console.print("3) Finish the tournament")
         console.print("4)[red] Back[/red]")
 
     def show_tournaments_list(self, tournaments):
-        print("[bold green]\nAll tournaments\n[/bold green]")
 
-        tournament_table = Table(title="Tournaments")
-        tournament_table.add_column("NUMBER")
+        tournament_table = Table(title="\nTournaments")
+        tournament_table.add_column("OPTION")
         tournament_table.add_column("NAME")
-        tournament_table.add_column("DATE")
+        tournament_table.add_column("START DATE")
         tournament_table.add_column("STATE")
         for i, tournament in enumerate(tournaments, 1):
             tournament_name = tournament.tournament_name
             start_date = tournament.start_date
             state = tournament.state
             tournament_table.add_row(str(i), tournament_name, start_date, state)
-            #console.print(f"[bold cyan]{i}.[/] {tournament_name} ({start_date}) | [yellow]{state}[/]")
-        #console.print(f"{len(tournaments)+1}.[red] Back[/red]")
-        
+
         console.print(tournament_table)
-        console.print("3)[red] Back[/red]")
+        console.print(f"{len(tournaments)+1})[red] Back[/red]")
 
     def show_games_list(self, round):
         console.print("[bold green]\nGames\n[/bold green]")
@@ -150,6 +148,13 @@ class View:
         console.print("2) Display all tournaments")
         console.print("3)[red] Back[/red]")
 
+    def reports_tournament_menu(self):
+        "Display the tournament menu"
+        console.print("[bold green]Tournament report\n[/bold green]")
+        console.print("1) Display tournament players")
+        console.print("2) Display tournament rounds and games")
+        console.print("3)[red] Back[/red]")
+
     def display_all_players(self, players) :
         table = Table(title="Players")
         table.add_column("National Chess ID", justify="center")
@@ -161,6 +166,34 @@ class View:
             table.add_row(player.national_chess_id, player.name, player.surname, player.birthdate)
 
         console.print(table)
+
+    def display_players_tournament(self, tournament):
+        table = Table(title="Players tournament")
+        table.add_column("National Chess ID", justify="center")
+        table.add_column("Name", justify="center")
+        table.add_column("Surname", justify="center")
+        table.add_column("Birthdate", justify="center")
+        table.add_column("Score tournament", justify="center")
+
+
+        for player in tournament.players :
+            table.add_row(player.player.national_chess_id, player.player.name, player.player.surname, player.player.birthdate, str(player.score))
+
+        console.print(table)
+
+    def display_tournament_rounds(self, tournament):
+        tree = Tree(f"{tournament.tournament_name}")
+        for round in tournament.rounds :
+            round_tree = tree.add(f"{round.name}")
+            for game in round.games_list :
+                player1 = game.player1.player
+                player2 = game.player2.player
+                game_tree = round_tree.add(f"{player1.name} {player1.surname}({player1.national_chess_id}) VS {player2.name} {player2.surname}({player2.national_chess_id})")
+
+        console.print(f"\n", tree)
+
+
+
 
 
 

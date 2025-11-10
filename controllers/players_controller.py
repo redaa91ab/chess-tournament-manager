@@ -51,7 +51,7 @@ class PlayersController:
             national_chess_id = self._get_valid_national_chess_id()
 
         player = Player.deserialize(national_chess_id)
-        if player is not None:
+        if player :
             self.view.show_message(f"{player.name} ({national_chess_id}) is already saved in the database !")
         elif player is None :
             name = self.view.get_input("Name : ")

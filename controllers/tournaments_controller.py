@@ -52,18 +52,6 @@ class TournamentsController:
             elif user_choice == "4" or user_choice == "4)":   
                 break
 
-    def reports_menu(self) :
-        while True :
-            self.view.reports_menu()
-            user_choice = int(self.view.get_input("\nChoose an option : "))
-            if user_choice == 1 :
-                self.players_controllers.display_all_players()
-            elif user_choice == 2 :
-                pass
-            elif user_choice == 3 :
-                break
-
-
     def create(self):
         """
         Collect new tournament details and save it in tournaments.json by using the methods save_json of the model Tournament
@@ -73,41 +61,18 @@ class TournamentsController:
         tournament_name = self.view.get_input("Tournament name : ").upper()
         place = self.view.get_input("Place : ")
         start_date = self._get_valid_date("Start date (DD/MM/YYYY) : ")
+        end_date = self._get_valid_date("End date (DD/MM/YYYY) : ")
         number_of_rounds = self._get_valid_number_of_rounds()
-        tournament = Tournament(tournament_name, place, start_date, number_of_rounds)
+        tournament = Tournament(tournament_name, place, start_date, end_date, number_of_rounds)
         tournament.save_json()
 
 
-    def add_player_tournament(self, tournament):
-        """
-        Add players to a tournament in tournaments.json
+    def add_player_tournament(self, tournament) :
 
-        Args:
-            tournament_name : The name of the tournament to add players to.
-                              If None, prompts the user to enter a tournament name.
-
-        Collect the tournament name if not provided and add player to the tournament in tournaments.json.
-        If a player doesn't exist, offers the option to create a new player or try again.
-        """
-            
-        while True :  
-            self.view.show_add_players_tournament_menu(tournament)
-            user_choice = self.view.get_input("\nChoose an option : ")
-            if user_choice in ["1","1)"]:
-                self._add_single_player_tournament(tournament)
-            elif user_choice in ["2","2)"]:
-                break
-
-    def _add_single_player_tournament(self, tournament) :
         while True : 
             national_chess_id = self.players_controllers._get_valid_national_chess_id()
             player = Player.deserialize(national_chess_id)
-            if player != None:
-                tournament.players.append(PlayerTournament(player, 0.0))
-                tournament.save_json()
-                self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added to the tournament !")
-                break
-            elif player is None:
+            if player is None:
                 self.view.show_message("\nThis player is not in the database :\n1) Type again \n2) Create a new player \n")
                 user_choice = self.view.get_input("Choose an option : ")
                 if user_choice in ["1","1)"]:
@@ -117,8 +82,19 @@ class TournamentsController:
                     tournament.players.append(PlayerTournament(player, 0.0))
                     tournament.save_json()
                     self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added to the tournament !")
-
                     break
+            elif player :
+                player_nid = player.national_chess_id
+                nid_players_tournament = [player.player.national_chess_id for player in tournament.players]
+                if player_nid in nid_players_tournament :
+                    self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) is already saved in the tournament.")
+                    break
+                else :
+                    tournament.players.append(PlayerTournament(player, 0.0))
+                    tournament.save_json()
+                    self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added to the tournament !")
+                    break
+                
 
     def start_tournament(self, tournament):
 
@@ -167,6 +143,44 @@ class TournamentsController:
                     break
 
 
+    def reports_menu(self) :
+        while True :
+            self.view.reports_menu()
+            user_choice = int(self.view.get_input("\nChoose an option : "))
+            if user_choice == 1 :
+                self.players_controllers.display_all_players()
+            elif user_choice == 2 :
+                self.reports_tournaments()
+            elif user_choice == 3 :
+                break
+
+
+
+    def reports_tournaments(self) :
+        while True :
+            tournament = self._select_tournament()
+            if tournament :
+                self.report_tournament(tournament)
+            else :
+                break
+
+    def report_tournament(self, tournament):
+        while True :
+            self.view.reports_tournament_menu()
+            user_choice = int(self.view.get_input("Select an option : "))
+            if user_choice == 1 :
+                self.view.display_players_tournament(tournament)
+                break
+            elif user_choice == 2 :
+                self.view.display_tournament_rounds(tournament)
+                break
+            elif user_choice == 3 :
+                break
+
+
+            
+
+
     def _select_tournament(self) :
         """Show the list of all tournaments and the user select
         Return the tournament object selected """
@@ -174,7 +188,7 @@ class TournamentsController:
         while True:
             tournaments = Tournament.deserialize_all_tournaments()
             self.view.show_tournaments_list(tournaments)
-            user_input = int(self.view.get_input("\nSelect a tournament : "))
+            user_input = int(self.view.get_input("\nSelect an option : "))
 
             if user_input == len(tournaments)+1:
                 break
@@ -226,6 +240,9 @@ class RoundController :
                 if actual_round.state == "in_progress" :
                     self.view.show_message("Please update the current round before to create a new one")
                     break
+            if tournament.state == "finished" :
+                self.view.show_message("The tournament is finished. You can't create a new round)")
+                break
     
             round = self.generate_round(tournament)
             self.view.show_games_list(round)
@@ -253,7 +270,8 @@ class RoundController :
                 games_list.append(game)
                 break
 
-        round = Round(f"ROUND {tournament.current_round+1}", games_list, "in_progress" )    
+        start_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        round = Round(f"ROUND {tournament.current_round+1}", games_list, "in_progress", start_date )    
         return round
 
     def update_results_games(self, tournament):
@@ -281,6 +299,10 @@ class RoundController :
                             game.player1.score +=0.5
                             game.player2.score +=0.5
 
+                    end_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                    actual_round.end_date = end_date
                     actual_round.state = "finished"
+                    if current_round == tournament.number_of_rounds :
+                        tournament.state = "finished"
                     tournament.save_json()
                     break
