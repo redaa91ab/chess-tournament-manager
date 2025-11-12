@@ -137,7 +137,8 @@ class TournamentsController:
                 if user_choice == 1 :
                     tournament.state = "finished"
                     tournament.save_json()
-                    self.view.show_message(f"\nThe tournament is now finish. You can view the reports on the menu \"Tournament reports\" ")
+                    self.view.display_rank_players(tournament)
+                    self.view.show_message(f"\n Tournament officialy finish. You can view the rank above")
                     break
                 elif user_choice == 2 :
                     break
@@ -170,15 +171,11 @@ class TournamentsController:
             user_choice = int(self.view.get_input("Select an option : "))
             if user_choice == 1 :
                 self.view.display_players_tournament(tournament)
-                break
             elif user_choice == 2 :
                 self.view.display_tournament_rounds(tournament)
-                break
+                self.view.display_rank_players(tournament)
             elif user_choice == 3 :
                 break
-
-
-            
 
 
     def _select_tournament(self) :

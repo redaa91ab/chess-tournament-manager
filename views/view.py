@@ -94,7 +94,7 @@ class View:
 
     def show_tournaments_list(self, tournaments):
 
-        tournament_table = Table(title="\nTournaments")
+        tournament_table = Table(title="\n[bold green]\nTournaments[bold green]")
         tournament_table.add_column("OPTION")
         tournament_table.add_column("NAME")
         tournament_table.add_column("START DATE")
@@ -150,13 +150,13 @@ class View:
 
     def reports_tournament_menu(self):
         "Display the tournament menu"
-        console.print("[bold green]Tournament report\n[/bold green]")
+        console.print("[bold green]\nTournament report\n[/bold green]")
         console.print("1) Display tournament players")
         console.print("2) Display tournament rounds and games")
         console.print("3)[red] Back[/red]")
 
     def display_all_players(self, players) :
-        table = Table(title="Players")
+        table = Table(title="[bold green]\nPlayers[/bold green]")
         table.add_column("National Chess ID", justify="center")
         table.add_column("Name", justify="center")
         table.add_column("Surname", justify="center")
@@ -168,7 +168,7 @@ class View:
         console.print(table)
 
     def display_players_tournament(self, tournament):
-        table = Table(title="Players tournament")
+        table = Table(title="[bold green]\nPlayers tournament[/bold green]")
         table.add_column("National Chess ID", justify="center")
         table.add_column("Name", justify="center")
         table.add_column("Surname", justify="center")
@@ -182,7 +182,7 @@ class View:
         console.print(table)
 
     def display_tournament_rounds(self, tournament):
-        tree = Tree(f"{tournament.tournament_name}")
+        tree = Tree(f"[bold green]{tournament.tournament_name}[/bold green]")
         for round in tournament.rounds :
             round_tree = tree.add(f"{round.name}")
             for game in round.games_list :
@@ -191,6 +191,24 @@ class View:
                 game_tree = round_tree.add(f"{player1.name} {player1.surname}({player1.national_chess_id}) VS {player2.name} {player2.surname}({player2.national_chess_id})")
 
         console.print(f"\n", tree)
+
+    def display_rank_players(self, tournament) :
+        players_sorted = sorted(tournament.players, key=lambda player : player.score, reverse=True)
+        table = Table(title = "[bold green]Players rank[/bold green]")
+        table.add_column("Rank place", justify="center")
+        table.add_column("Player", justify="center")
+        table.add_column("Score", justify="center")
+
+        for i, player in enumerate(players_sorted, 1) :
+            player_string = (f"{player.player.name} {player.player.surname}({player.player.national_chess_id})")
+            table.add_row(str(i), player_string , str(player.score))
+
+        console.print(f"\n", table)
+
+
+
+
+
 
 
 
