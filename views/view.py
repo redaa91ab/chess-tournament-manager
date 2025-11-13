@@ -70,15 +70,7 @@ class View:
         console.print("2) Add players")
         console.print("[red]3) Back [/red]")
 
-    def show_add_players_tournament_menu(self, tournament):
-        """
-        Display the menu for adding players to a tournament.
 
-        Shows options for adding new players or going back.
-        """
-        console.print(f"[bold green]\n{tournament.tournament_name}[/bold green]")
-        console.print("\n1) Add new player")
-        console.print("2)[red] Back[/red]")
 
     def show_start_tournament_menu(self):
         """
@@ -92,7 +84,7 @@ class View:
         console.print("3) Finish the tournament")
         console.print("4)[red] Back[/red]")
 
-    def show_tournaments_list(self, tournaments):
+    def show_select_tournament(self, tournaments):
 
         tournament_table = Table(title="\n[bold green]\nTournaments[bold green]")
         tournament_table.add_column("OPTION")

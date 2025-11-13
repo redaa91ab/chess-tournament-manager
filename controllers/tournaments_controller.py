@@ -156,7 +156,6 @@ class TournamentsController:
                 break
 
 
-
     def reports_tournaments(self) :
         while True :
             tournament = self._select_tournament()
@@ -184,7 +183,7 @@ class TournamentsController:
 
         while True:
             tournaments = Tournament.deserialize_all_tournaments()
-            self.view.show_tournaments_list(tournaments)
+            self.view.show_select_tournament(tournaments)
             user_input = int(self.view.get_input("\nSelect an option : "))
 
             if user_input == len(tournaments)+1:
