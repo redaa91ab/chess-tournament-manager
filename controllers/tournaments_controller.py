@@ -15,15 +15,17 @@ class TournamentsController:
 
         Args:
             view: An instance of the View class
+            players_controller : An instance of the Players Controller
+            round_controller : An instance of the Round Controller
         """
         self.view = view
-        self.players_controllers = PlayersController(self.view)
-        self.round = RoundController(self.view)
+        self.players_controller = PlayersController(self.view)
+        self.round_controller = RoundController(self.view)
 
     def manage_tournaments(self):
         """
-        Display the tournament management menu, collect the user selection and delegates tasks to the TournamentsController
-        for creating tournaments, adding players, playing tournaments, or go back.
+        Display the tournament management menu and offer 4 option : 
+        create tournament, add players, start tournament, or going back.
         """
 
         while True :
@@ -54,7 +56,7 @@ class TournamentsController:
 
     def create(self):
         """
-        Collect new tournament details and save it in tournaments.json by using the methods save_json of the model Tournament
+        Create a tournament object and save it to JSON
         """
         self.view.show_message("\n[bold green]Create tournament[/bold green]\n")
         self.view.show_message("Enter the new tournament details below : ")
@@ -68,9 +70,10 @@ class TournamentsController:
 
 
     def add_player_tournament(self, tournament) :
+        """ Ask for national_chess_id, retrieve the playe and create a PlayerTournament object then save it in players in the tournament"""
 
         while True : 
-            national_chess_id = self.players_controllers._get_valid_national_chess_id()
+            national_chess_id = self.players_controller._get_valid_national_chess_id()
             player = Player.deserialize(national_chess_id)
             if player is None:
                 self.view.show_message("\nThis player is not in the database :\n1) Type again \n2) Create a new player \n")
@@ -78,7 +81,7 @@ class TournamentsController:
                 if user_choice == 1:
                     continue
                 elif user_choice == 2:
-                    player = self.players_controllers.add_player(national_chess_id)
+                    player = self.players_controller.add_player(national_chess_id)
                     tournament.players.append(PlayerTournament(player, 0.0))
                     tournament.save_json()
                     self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added to the tournament !")
@@ -97,14 +100,15 @@ class TournamentsController:
                 
 
     def start_tournament(self, tournament):
+        """ Display start_tournament menu, then either create a new round, update the actual round or finish the tournament"""
 
         while True :
             self.view.show_start_tournament_menu()
             user_choice = self._get_valid_choice(4)
             if user_choice == 1 :
-                self.round.create_round_menu(tournament)
+                self.round_controller.create_round_menu(tournament)
             elif user_choice == 2 :
-                self.round.update_results_games(tournament)
+                self.round_controller.update_results_games(tournament)
             elif user_choice == 3:
                 self.finish_tournament(tournament)
             elif user_choice == 4 :
@@ -153,7 +157,7 @@ class TournamentsController:
             self.view.reports_menu()
             user_choice = self._get_valid_choice(2)
             if user_choice == 1 :
-                self.players_controllers.display_all_players()
+                self.players_controller.display_all_players()
             elif user_choice == 2 :
                 self.reports_tournaments()
             elif user_choice == 3 :
