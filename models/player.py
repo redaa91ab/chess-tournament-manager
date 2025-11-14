@@ -1,6 +1,5 @@
-from config import DATA_PLAYERS_PATH
 from tinydb import TinyDB, Query
-db_players = TinyDB(DATA_PLAYERS_PATH)
+db_players = TinyDB("data/players.json")
 players_table = db_players.table("players")
 
 class Player:

@@ -1,17 +1,14 @@
-from config import DATA_TOURNAMENTS_PATH
 from tinydb import TinyDB, Query
 from .player import Player
 import uuid 
 db_tournaments = TinyDB("data/tournaments.json")
 tournament_table = db_tournaments.table("tournaments")
-TinyDB("data/tournaments.json").table("tournaments")
 
 class Tournament:
     """
-    A class representing a chess tournament, storing details such as name, location, dates,
-    rounds, and players. 
+    A class representing a chess tournament
 
-    It provides methods to save tournament data to a JSON file and
+    It provides methods to save tournament data to JSON and
     retrieve or update tournament information.
     """
 
@@ -26,6 +23,12 @@ class Tournament:
             start_date : The start date of the tournament.
             end_date : The end date of the tournament.
             number_of_rounds : The number of rounds in the tournament. Defaults to 4.
+            current_round : The number of the round that is actually playing
+            players : List of PlayerTournament objects
+            rounds : List of round objects
+            manager_comment : Comment of the manager
+            state : state of the tournament
+            tournament_id : Unique id for the tournament
         """
         self.tournament_name = tournament_name
         self.place = place
@@ -40,10 +43,11 @@ class Tournament:
         self.tournament_id = tournament_id
 
     def generate_tournament_id(self):
+        """ return a tournament_id"""
         return str(uuid.uuid4())
     
     def serialize(self):
-        """ Serialize the python object of the tournament model and return a dict"""
+        """ return a dict of the tournament object """
         serialized_data = {
             "tournament_name": self.tournament_name,
             "place": self.place,
@@ -67,39 +71,45 @@ class Tournament:
         
         tournament_table.upsert(self.serialize(), (Query()["tournament_id"] == self.tournament_id))
 
+
+    @classmethod
+    def deserialize(cls, tournament_serialized):
+        """ return the tournament object """
+        tournament_name = tournament_serialized["tournament_name"]
+        place = tournament_serialized["place"]
+        start_date = tournament_serialized["start_date"]
+        end_date = tournament_serialized["end_date"]
+        number_of_rounds = tournament_serialized["number_of_rounds"]
+        current_round = tournament_serialized["current_round"]
+        players = [PlayerTournament.deserialize(player) for player in tournament_serialized["players"]]
+        rounds = [Round.deserialize(round) for round in tournament_serialized["rounds"]]
+        manager_comment = tournament_serialized["manager_comment"]
+        state = tournament_serialized["state"]
+        tournament_id = tournament_serialized["tournament_id"]
+
+        tournament = Tournament(tournament_name, place, start_date, end_date, number_of_rounds, current_round, players, rounds,
+                                manager_comment, state, tournament_id)
+        
+        return tournament
+
     
     @classmethod
     def deserialize_all_tournaments(cls) :
-        """ return a list of all tournament object """
-        tournaments = []
-        
-        for tournament in tournament_table.all():
-            tournament_name = tournament["tournament_name"]
-            place = tournament["place"]
-            start_date = tournament["start_date"]
-            end_date = tournament["end_date"]
-            number_of_rounds = tournament["number_of_rounds"]
-            current_round = tournament["current_round"]
-            players = [PlayerTournament.deserialize(player) for player in tournament["players"]]
-            rounds = [Round.deserialize(round) for round in tournament["rounds"]]
-            manager_comment = tournament["manager_comment"]
-            state = tournament["state"]
-            tournament_id = tournament["tournament_id"]
+        """ return a list of all tournaments object """
 
-
-            tournament = Tournament(tournament_name, place, start_date, end_date, number_of_rounds, current_round, players, rounds,
-                                    manager_comment, state, tournament_id)
-            tournaments.append(tournament)
+        tournaments = [Tournament.deserialize(tournament) for tournament in tournament_table.all()]
 
         return tournaments
     
     def get_players_sorted(self):
+        """ return a list of the players of the tournament sorted from the highest score to the lowest"""
         players_list = self.players
         players_list_sorted = sorted(players_list, key=lambda player: player.score)
         return players_list_sorted
     
 
     def get_previous_opponents(self, player):
+        """ return a list of the previous opponents that the players played against in the tournament """
         previous_opponents = []
 
         for round in self.rounds :

@@ -6,7 +6,7 @@ from datetime import datetime
 class TournamentsController:
     """
     A controller class for managing tournament.
-    It provides methods to create a new tournament in tournaments.json and add new players to a tournament
+    It provides methods to create, select or modify a tournament
     """
 
     def __init__(self, view):
@@ -28,17 +28,17 @@ class TournamentsController:
 
         while True :
             self.view.show_tournaments_menu()
-            user_choice = self.view.get_input("\nChoose an option : ")
-            if user_choice == "1" or user_choice == "1)":
+            user_choice = self._get_valid_choice(4)
+            if user_choice == 1 :
                 self.create()
-            elif user_choice == "2" or user_choice == "2)":
+            elif user_choice == 2 :
                 tournament = self._select_tournament()
                 if tournament :
                     if tournament.state == "finished" :
                         self.view.show_message("This tournament is finished. You can't add players.")
                     else :
                         self.add_player_tournament(tournament)
-            elif user_choice == "3" or user_choice == "3)":
+            elif user_choice == 3:
                 tournament = self._select_tournament()
                 if tournament :
                     if tournament.state == "finished" :
@@ -46,10 +46,10 @@ class TournamentsController:
                     elif len(tournament.players) < 4 :
                         self.view_show_message(f"You need at least 4 players to start a tournament.  Current number of players = {len(tournament.players)}")
                     elif len(tournament.players) %2 != 0 :
-                        self.view_show_message(f"You need to a even number of players to start. Current number of players = {len(tournament.players)}")
+                        self.view_show_message(f"You need a even number of players to start. Current number of players = {len(tournament.players)}")
                     else :
                         self.start_tournament(tournament)
-            elif user_choice == "4" or user_choice == "4)":   
+            elif user_choice == 4 : 
                 break
 
     def create(self):
@@ -58,7 +58,7 @@ class TournamentsController:
         """
         self.view.show_message("\n[bold green]Create tournament[/bold green]\n")
         self.view.show_message("Enter the new tournament details below : ")
-        tournament_name = self.view.get_input("Tournament name : ").upper()
+        tournament_name = self.view.get_input("Tournament name : ")
         place = self.view.get_input("Place : ")
         start_date = self._get_valid_date("Start date (DD/MM/YYYY) : ")
         end_date = self._get_valid_date("End date (DD/MM/YYYY) : ")
@@ -74,10 +74,10 @@ class TournamentsController:
             player = Player.deserialize(national_chess_id)
             if player is None:
                 self.view.show_message("\nThis player is not in the database :\n1) Type again \n2) Create a new player \n")
-                user_choice = self.view.get_input("Choose an option : ")
-                if user_choice in ["1","1)"]:
+                user_choice = self._get_valid_choice(2)
+                if user_choice == 1:
                     continue
-                elif user_choice in ["2","2)"]:
+                elif user_choice == 2:
                     player = self.players_controllers.add_player(national_chess_id)
                     tournament.players.append(PlayerTournament(player, 0.0))
                     tournament.save_json()
@@ -100,14 +100,14 @@ class TournamentsController:
 
         while True :
             self.view.show_start_tournament_menu()
-            user_choice = self.view.get_input("\nSelect an option : ")
-            if user_choice in ["1","1)"] :
+            user_choice = self._get_valid_choice(4)
+            if user_choice == 1 :
                 self.round.create_round_menu(tournament)
-            elif user_choice in ["2","2)"] :
+            elif user_choice == 2 :
                 self.round.update_results_games(tournament)
-            elif user_choice in ["3","3)"] :
+            elif user_choice == 3:
                 self.finish_tournament(tournament)
-            elif user_choice in ["4","4)"] :
+            elif user_choice == 4 :
                 break
 
         
@@ -119,8 +119,12 @@ class TournamentsController:
             actual_round = rounds[current_round-1]
 
             if tournament.current_round < tournament.number_of_rounds :
-                self.view.show_message(f"\nThis tournament should last {tournament.number_of_rounds} rounds\n1) Finish the tournament earlier \n2)[red] Back [/red] \n")
-                user_choice = int(self.view.get_input("\nSelect an option : "))
+                self.view.show_message(f"\nThis tournament should last {tournament.number_of_rounds} rounds"
+                                        "\n1) Finish the tournament earlier"
+                                        "\n2)[red] Back [/red] \n"
+                                        )
+                
+                user_choice = self._get_valid_choice(2)
                 if user_choice == 1 :
                     pass
                 elif user_choice == 2 :
@@ -133,7 +137,7 @@ class TournamentsController:
                 break
             elif actual_round.state == "finished" :
                 self.view.show_message(f"\nWARNING : The tournament will no longer be modifiable . Do you want to finish the tournament ?\n1) Finish the tournament anyway \n2) Back\n")
-                user_choice = int(self.view.get_input("\nSelect an option : "))
+                user_choice = self._get_valid_choice(2)
                 if user_choice == 1 :
                     tournament.state = "finished"
                     tournament.save_json()
@@ -147,7 +151,7 @@ class TournamentsController:
     def reports_menu(self) :
         while True :
             self.view.reports_menu()
-            user_choice = int(self.view.get_input("\nChoose an option : "))
+            user_choice = self._get_valid_choice(2)
             if user_choice == 1 :
                 self.players_controllers.display_all_players()
             elif user_choice == 2 :
@@ -167,7 +171,7 @@ class TournamentsController:
     def report_tournament(self, tournament):
         while True :
             self.view.reports_tournament_menu()
-            user_choice = int(self.view.get_input("Select an option : "))
+            user_choice = self._get_valid_choice(3)
             if user_choice == 1 :
                 self.view.display_players_tournament(tournament)
             elif user_choice == 2 :
@@ -184,16 +188,22 @@ class TournamentsController:
         while True:
             tournaments = Tournament.deserialize_all_tournaments()
             self.view.show_select_tournament(tournaments)
-            user_input = int(self.view.get_input("\nSelect an option : "))
+            user_choice = self._get_valid_choice(len(tournaments)+1)
 
-            if user_input == len(tournaments)+1:
+            if user_choice == len(tournaments)+1:
                 break
-            elif user_input > len(tournaments)+1:
-                self.view.show_message("No tournament was find with that ID. Please try again.")
             else:
-                tournament_index = user_input-1
+                tournament_index = user_choice-1
                 tournament = tournaments[tournament_index]
                 return tournament
+            
+    def _get_valid_choice(self, number_of_choice) :
+        while True :
+            user_choice = int(self.view.get_input("Select an option : "))
+            if 1 <= user_choice <= number_of_choice :
+                return user_choice
+            else :
+                self.view.show_message("Please select a valid option")
             
     def _get_valid_number_of_rounds(self) :
         "return a valid number of rounds (int)"
@@ -219,6 +229,10 @@ class TournamentsController:
                 self.view.show_message(f"Invalid input: {e}")
 
 class RoundController :
+    """
+    A controller class for managing rounds.
+    It provides methods to create or update rounds
+    """
     
     def __init__(self, view):
         self.view = view
