@@ -109,7 +109,7 @@ class Tournament:
     
 
     def get_previous_opponents(self, player):
-        """ return a list of the previous opponents that the players played against in the tournament """
+        """ return a list of the previous opponents that the player played against in the tournament """
         previous_opponents = []
 
         for round in self.rounds :
@@ -120,7 +120,22 @@ class Tournament:
     
 
 class Round :
+    """
+    A class representing a round in the chess tournament
+
+    It provides methods to serialize and deseralize the round, and to get the previous oppponent of a player in the round
+    """
     def __init__(self, name, games_list, state, start_date = None, end_date = None): 
+        """
+        Initialize a round with the provided details.
+
+        Args:
+            name : The name of the round (ROUND 1, ROUND 2, etc..).
+            games_list : List of game objects
+            state : in_progress or finished
+            start_date : The start date of the round
+            end_date : The end date of the round
+        """
         self.name = name
         self.games_list = games_list
         self.state = state
@@ -128,6 +143,7 @@ class Round :
         self.end_date = end_date
 
     def serialize(self):
+        """ return a dict of the round object """
         serialized_data = {
             "name" : self.name,
             "games_list" : [game.serialize() for game in self.games_list], 
@@ -140,6 +156,7 @@ class Round :
                
     @classmethod
     def deserialize(cls, round_serialized):
+        """ return an object of the serialized round """
         name = round_serialized["name"]
         games_list = [Game.deserialize(game) for game in round_serialized["games_list"]]
         state = round_serialized["state"]
@@ -151,6 +168,7 @@ class Round :
     
 
     def get_previous_opponents_round(self, player):
+        """ return a list of the previous opponents that the player played against in the round"""
 
         previous_opponents = []
         for game in self.games_list :
@@ -162,11 +180,24 @@ class Round :
     
 
 class Game :
+    """
+    A class representing a game in the chess tournament
+
+    It provides methods to serialize and deseralize the game
+    """
     def __init__(self, player1, player2):
+        """
+        Initialize a game with the provided details.
+
+        Args:
+            player1 : first PlayerTournament object 
+            player2 : second PlayerTournament object
+        """
         self.player1 = player1
         self.player2 = player2
    
     def serialize(self):
+        """ return a dict of the game object """
         serialized_data = (
             self.player1.serialize(),
             self.player2.serialize()
@@ -175,6 +206,7 @@ class Game :
     
     @classmethod
     def deserialize(cls, game_serialized) :
+        "return a game object"
         player1_serialized = game_serialized[0]
         player1_deserialized = PlayerTournament.deserialize(player1_serialized)
         player2_serialized = game_serialized[1]
@@ -185,11 +217,24 @@ class Game :
 
 
 class PlayerTournament :
+    """
+    A class representing a player in the chess tournament
+
+    It provides methods to serialize and deseralize the player
+    """
     def __init__(self, player, score) :
+        """
+        Initialize a player with the provided details.
+
+        Args:
+            player : Player object 
+            score : score of the player in the tournament
+        """
         self.player = player
         self.score = score
 
     def serialize(self):
+        """ return a dict of the PlayerTournament object"""
         serialized_data = [
             self.player.national_chess_id,
             self.score
@@ -198,7 +243,7 @@ class PlayerTournament :
 
     @classmethod
     def deserialize(cls, player_serialized) :
-        
+        """ return a PlayerTournament object """
         national_chess_id = player_serialized[0]
         player = Player.deserialize(national_chess_id)
         score = player_serialized[1]
