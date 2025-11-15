@@ -10,7 +10,7 @@ class Player:
     It provides methods to save player to JSON, serialize, deserialize and retrieve player information.
     """
 
-    def __init__(self, national_chess_id, name, surname, birthdate, score):
+    def __init__(self, national_chess_id, name, surname, birthdate):
         """
         Initialize a Player instance with the provided details.
 

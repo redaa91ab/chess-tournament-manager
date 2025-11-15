@@ -197,11 +197,14 @@ class TournamentsController:
             
     def _get_valid_choice(self, number_of_choice) :
         while True :
-            user_choice = int(self.view.get_input("Select an option : "))
-            if 1 <= user_choice <= number_of_choice :
-                return user_choice
-            else :
-                self.view.show_message("Please select a valid option")
+            try :
+                user_choice = int(self.view.get_input("Select an option : "))
+                if 1 <= user_choice <= number_of_choice :
+                    return user_choice
+                else :
+                    self.view.show_message("Please select a valid option")
+            except ValueError:
+                self.view.show_message("Please enter a number")
             
     def _get_valid_number_of_rounds(self) :
         "return a valid number of rounds (int)"
