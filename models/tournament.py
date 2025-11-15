@@ -104,7 +104,7 @@ class Tournament:
     def get_players_sorted(self):
         """ return a list of the players of the tournament sorted from the highest score to the lowest"""
         players_list = self.players
-        players_list_sorted = sorted(players_list, key=lambda player: player.score)
+        players_list_sorted = sorted(players_list, key=lambda player: player.total_score)
         return players_list_sorted
     
 
@@ -185,7 +185,7 @@ class Game :
 
     It provides methods to serialize and deseralize the game
     """
-    def __init__(self, player1, player2):
+    def __init__(self, player1, score_player1, player2, score_player2):
         """
         Initialize a game with the provided details.
 
@@ -194,25 +194,31 @@ class Game :
             player2 : second PlayerTournament object
         """
         self.player1 = player1
+        self.score_player1 = score_player1
         self.player2 = player2
+        self.score_player2 = score_player2
    
     def serialize(self):
         """ return a dict of the game object """
         serialized_data = (
-            self.player1.serialize(),
-            self.player2.serialize()
+            [self.player1.national_chess_id, self.score_player1],
+            [self.player2.national_chess_id, self.score_player2]
             )
         return serialized_data
     
     @classmethod
     def deserialize(cls, game_serialized) :
         "return a game object"
-        player1_serialized = game_serialized[0]
-        player1_deserialized = PlayerTournament.deserialize(player1_serialized)
-        player2_serialized = game_serialized[1]
-        player2_deserialized = PlayerTournament.deserialize(player2_serialized)
+        player1_national_chess_id = game_serialized[0][0]
+        player1 = Player.deserialize(player1_national_chess_id)
+        score_player1 = game_serialized[0][1]
 
-        game_deserialized = Game(player1_deserialized, player2_deserialized)
+        player2_national_chess_id = game_serialized[1][0]
+        player2 = Player.deserialize(player2_national_chess_id)
+        score_player2 = game_serialized[1][1]
+
+        game_deserialized = Game(player1, score_player1, player2, score_player2)
+
         return game_deserialized
 
 
@@ -222,22 +228,22 @@ class PlayerTournament :
 
     It provides methods to serialize and deseralize the player
     """
-    def __init__(self, player, score) :
+    def __init__(self, player, total_score) :
         """
         Initialize a player with the provided details.
 
         Args:
             player : Player object 
-            score : score of the player in the tournament
+            total_score : total score of the player in the tournament
         """
         self.player = player
-        self.score = score
+        self.total_score = total_score
 
     def serialize(self):
         """ return a dict of the PlayerTournament object"""
         serialized_data = [
             self.player.national_chess_id,
-            self.score
+            self.total_score
             ]
         return serialized_data
 
@@ -246,9 +252,9 @@ class PlayerTournament :
         """ return a PlayerTournament object """
         national_chess_id = player_serialized[0]
         player = Player.deserialize(national_chess_id)
-        score = player_serialized[1]
+        total_score = player_serialized[1]
 
-        player_deserialized = PlayerTournament(player, score)
+        player_deserialized = PlayerTournament(player, total_score)
         
         return player_deserialized
 

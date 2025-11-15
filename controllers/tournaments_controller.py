@@ -46,9 +46,9 @@ class TournamentsController:
                     if tournament.state == "finished" :
                         self.view.show_message("This tournament is finished. You can't start a tournament.")
                     elif len(tournament.players) < 4 :
-                        self.view_show_message(f"You need at least 4 players to start a tournament.  Current number of players = {len(tournament.players)}")
+                        self.view.show_message(f"You need at least 4 players to start a tournament.  Current number of players = {len(tournament.players)}")
                     elif len(tournament.players) %2 != 0 :
-                        self.view_show_message(f"You need a even number of players to start. Current number of players = {len(tournament.players)}")
+                        self.view.show_message(f"You need a even number of players to start. Current number of players = {len(tournament.players)}")
                     else :
                         self.start_tournament(tournament)
             elif user_choice == 4 : 
@@ -70,7 +70,7 @@ class TournamentsController:
 
 
     def add_player_tournament(self, tournament) :
-        """ Ask for national_chess_id, retrieve the playe and create a PlayerTournament object then save it in players in the tournament"""
+        """ Ask for national_chess_id, retrieve the player and create a PlayerTournament object then save it in players in the tournament"""
 
         while True : 
             national_chess_id = self.players_controller._get_valid_national_chess_id()
@@ -116,40 +116,34 @@ class TournamentsController:
 
         
     def finish_tournament(self, tournament) :
+        """ D"""
 
         while True :
             rounds = tournament.rounds
             current_round = tournament.current_round
             actual_round = rounds[current_round-1]
 
-            if tournament.current_round < tournament.number_of_rounds :
+            if actual_round.state == "in_progress" :
+                self.view.show_message(f"\nPlease update the last round results before to finish the tournament")
+                break
+
+            elif tournament.current_round < tournament.number_of_rounds :
                 self.view.show_message(f"\nThis tournament should last {tournament.number_of_rounds} rounds"
                                         "\n1) Finish the tournament earlier"
                                         "\n2)[red] Back [/red] \n"
                                         )
-                
                 user_choice = self._get_valid_choice(2)
                 if user_choice == 1 :
                     pass
                 elif user_choice == 2 :
                     break
-                else :
-                    self.view.show_message("Please select an option between 1 and 2")
-                    continue
-            if actual_round.state == "in_progress" :
-                self.view.show_message(f"\nPlease update the last round results before to finish the tournament")
-                break
-            elif actual_round.state == "finished" :
-                self.view.show_message(f"\nWARNING : The tournament will no longer be modifiable . Do you want to finish the tournament ?\n1) Finish the tournament anyway \n2) Back\n")
-                user_choice = self._get_valid_choice(2)
-                if user_choice == 1 :
-                    tournament.state = "finished"
-                    tournament.save_json()
-                    self.view.display_rank_players(tournament)
-                    self.view.show_message(f"\n Tournament officialy finish. You can view the rank above")
-                    break
-                elif user_choice == 2 :
-                    break
+
+            else :
+                tournament.state = "finished"
+                tournament.save_json()
+                self.view.display_rank_players(tournament)
+                self.view.show_message(f"\n Tournament officialy finish. You can view the rank above")
+   
 
 
     def reports_menu(self) :
@@ -280,7 +274,7 @@ class RoundController :
                     players = [player for player in players if player not in previous_opponents]
                 opponent = players[0]
                 players.remove(opponent)
-                game = Game(player, opponent)
+                game = Game(player, 0.0, opponent, 0.0)
                 games_list.append(game)
                 break
 
@@ -306,17 +300,21 @@ class RoundController :
                     for game in actual_round.games_list :
                         winner = self.view.update_game_result(game)
                         if winner == game.player1 :
-                                game.player1.score +=1
+                                game.player1_score =1
+                                game.player1.total_score +=1
                         elif winner == game.player2 :
-                                game.player2.score +=1
+                                game.player2_score =1
+                                game.player2.total_score +=1
                         elif winner == None :
-                            game.player1.score +=0.5
-                            game.player2.score +=0.5
+                            game.player1_score =0.5
+                            game.player1.total_score +=0.5
+                            game.player2_score =0.5
+                            game.player2.total_score +=0.5
 
                     end_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
                     actual_round.end_date = end_date
                     actual_round.state = "finished"
                     if current_round == tournament.number_of_rounds :
-                        tournament.state = "finished"
+                        TournamentsController(self.view).finish_tournament(tournament)
                     tournament.save_json()
                     break

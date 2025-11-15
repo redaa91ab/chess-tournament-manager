@@ -1,4 +1,6 @@
 from tinydb import TinyDB
+
+
 db_players = TinyDB("data/players.json")
 players_table = db_players.table("players")
 
@@ -8,7 +10,7 @@ class Player:
     It provides methods to save player to JSON, serialize, deserialize and retrieve player information.
     """
 
-    def __init__(self, national_chess_id, name, surname, birthdate):
+    def __init__(self, national_chess_id, name, surname, birthdate, score):
         """
         Initialize a Player instance with the provided details.
 
