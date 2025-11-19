@@ -12,12 +12,13 @@ class Tournament:
     retrieve or update tournament information.
     """
 
-    def __init__(self, tournament_name, place, start_date, end_date = None, number_of_rounds = 4,current_round = 0, players = [], rounds = [],
-                manager_comment = None, state = "not_started", tournament_id = None):
+    def __init__(self, tournament_id, tournament_name, place, start_date, end_date = None, number_of_rounds = 4,current_round = 0, players = [], rounds = [],
+                manager_comment = None, state = "not_started"):
         """
         Initialize a Tournament instance with the provided details.
 
         Args:
+            tournament_id : Unique id for the tournament
             tournament_name : The name of the tournament.
             place : The location of the tournament.
             start_date : The start date of the tournament.
@@ -28,8 +29,8 @@ class Tournament:
             rounds : List of round objects
             manager_comment : Comment of the manager
             state : state of the tournament
-            tournament_id : Unique id for the tournament
         """
+        self.tournament_id = tournament_id
         self.tournament_name = tournament_name
         self.place = place
         self.start_date = start_date
@@ -40,15 +41,16 @@ class Tournament:
         self.rounds = rounds
         self.manager_comment = manager_comment
         self.state = state
-        self.tournament_id = tournament_id
 
-    def generate_tournament_id(self):
+    @classmethod
+    def generate_tournament_id(cls):
         """ return a tournament_id"""
         return str(uuid.uuid4())
     
     def serialize(self):
         """ return a dict of the tournament object """
         serialized_data = {
+            "tournament_id": self.tournament_id,
             "tournament_name": self.tournament_name,
             "place": self.place,
             "start_date" : self.start_date,
@@ -58,16 +60,12 @@ class Tournament:
             "players": [player.serialize() for player in self.players],
             "rounds" : [round.serialize() for round in self.rounds],
             "manager_comment" : self.manager_comment,
-            "state": self.state,
-            "tournament_id": self.tournament_id
+            "state": self.state
         }
         return serialized_data
 
     def save_json(self):
         """ Save the tournament's details to the tournaments JSON database. """
-        
-        if self.tournament_id is None :
-            self.tournament_id = self.generate_tournament_id()
         
         tournament_table.upsert(self.serialize(), (Query()["tournament_id"] == self.tournament_id))
 
@@ -75,6 +73,7 @@ class Tournament:
     @classmethod
     def deserialize(cls, tournament_serialized):
         """ return the tournament object """
+        tournament_id = tournament_serialized["tournament_id"]
         tournament_name = tournament_serialized["tournament_name"]
         place = tournament_serialized["place"]
         start_date = tournament_serialized["start_date"]
@@ -82,13 +81,12 @@ class Tournament:
         number_of_rounds = tournament_serialized["number_of_rounds"]
         current_round = tournament_serialized["current_round"]
         players = [PlayerTournament.deserialize(player) for player in tournament_serialized["players"]]
-        rounds = [Round.deserialize(round) for round in tournament_serialized["rounds"]]
+        rounds = [Round.deserialize(round, players) for round in tournament_serialized["rounds"]]
         manager_comment = tournament_serialized["manager_comment"]
         state = tournament_serialized["state"]
-        tournament_id = tournament_serialized["tournament_id"]
 
-        tournament = Tournament(tournament_name, place, start_date, end_date, number_of_rounds, current_round, players, rounds,
-                                manager_comment, state, tournament_id)
+        tournament = Tournament(tournament_id, tournament_name, place, start_date, end_date, number_of_rounds, current_round, players, rounds,
+                                manager_comment, state)
         
         return tournament
 
@@ -155,10 +153,10 @@ class Round :
         return serialized_data
                
     @classmethod
-    def deserialize(cls, round_serialized):
+    def deserialize(cls, round_serialized, players):
         """ return an object of the serialized round """
         name = round_serialized["name"]
-        games_list = [Game.deserialize(game) for game in round_serialized["games_list"]]
+        games_list = [Game.deserialize(game, players) for game in round_serialized["games_list"]]
         state = round_serialized["state"]
         start_date = round_serialized["start_date"]
         end_date = round_serialized["end_date"]
@@ -185,7 +183,7 @@ class Game :
 
     It provides methods to serialize and deseralize the game
     """
-    def __init__(self, player1, score_player1, player2, score_player2):
+    def __init__(self, player1_tournament, score_player1_tournament, player2_tournament, score_player2_tournament):
         """
         Initialize a game with the provided details.
 
@@ -193,24 +191,26 @@ class Game :
             player1 : first PlayerTournament object 
             player2 : second PlayerTournament object
         """
-        self.player1 = player1
-        self.score_player1 = score_player1
-        self.player2 = player2
-        self.score_player2 = score_player2
+        self.player1_tournament = player1_tournament
+        self.score_player1_tournament = score_player1_tournament
+        self.score_player2_tournament = score_player2_tournament
+        self.player2_tournament = player2_tournament
+
    
     def serialize(self):
         """ return a dict of the game object """
         serialized_data = (
-            [self.player1.national_chess_id, self.score_player1],
-            [self.player2.national_chess_id, self.score_player2]
+            [self.player1_tournament.player.national_chess_id, self.score_player1_tournament],
+            [self.player2_tournament.player.national_chess_id, self.score_player2_tournament]
             )
         return serialized_data
     
     @classmethod
-    def deserialize(cls, game_serialized) :
+    def deserialize(cls, game_serialized, players) :
         "return a game object"
         player1_national_chess_id = game_serialized[0][0]
-        player1 = Player.deserialize(player1_national_chess_id)
+        
+        player1 = PlayerTournament.deserialize(player1_national_chess_id, players)
         score_player1 = game_serialized[0][1]
 
         player2_national_chess_id = game_serialized[1][0]
@@ -222,13 +222,13 @@ class Game :
         return game_deserialized
 
 
-class PlayerTournament :
+class PlayerTournament(Player) :
     """
     A class representing a player in the chess tournament
 
     It provides methods to serialize and deseralize the player
     """
-    def __init__(self, player, total_score) :
+    def __init__(self, national_chess_id, name, surname, birthdate, total_points) :
         """
         Initialize a player with the provided details.
 
@@ -236,27 +236,67 @@ class PlayerTournament :
             player : Player object 
             total_score : total score of the player in the tournament
         """
-        self.player = player
-        self.total_score = total_score
+        super().__init__(national_chess_id, name, surname, birthdate)
+        self.total_points = total_points
 
     def serialize(self):
         """ return a dict of the PlayerTournament object"""
         serialized_data = [
             self.player.national_chess_id,
-            self.total_score
+            self.total_points
             ]
         return serialized_data
 
     @classmethod
-    def deserialize(cls, player_serialized) :
+    def deserialize(cls, player_tournament_serialized) :
         """ return a PlayerTournament object """
-        national_chess_id = player_serialized[0]
-        player = Player.deserialize(national_chess_id)
-        total_score = player_serialized[1]
-
-        player_deserialized = PlayerTournament(player, total_score)
         
-        return player_deserialized
+        national_chess_id = player_tournament_serialized[0]
+        player = Player.deserialize(national_chess_id)
+        total_points = player_tournament_serialized[1]
+
+        player_tournament_deserialized = PlayerTournament(player, total_points)
+        
+        return player_tournament_deserialized
+    
+    @classmethod
+    def deserialize_by_nid(cls, national_chess_id, players: list):
+        player_tournament_deserialized = next((player for player in players if player.national_chess_id == national_chess_id), None)
+
+        return player_tournament_deserialized
+    
+
+"""
+class PlayerGame :
+
+    def __init__(self, player_tournament, score) :
+
+        self.player = player_tournament.player
+        self.player_tournament = player_tournament
+        self.score = score
+
+
+    def serialize(self):
+        serialized_data = [
+            self.player.national_chess_id,
+            self.total_score
+        ]
+        return serialized_data
+    
+    @classmethod
+    def deserialize(cls, player_game_serialized, players) :
+
+        for tournament in tournament_table.all() :
+            if tourn
+
+        #step1 : Pgs = NID & score to total points
+        #Pt = player(des_nid) + total points
+        #
+        #step : PlayerGame(player_tournament, score)
+        national_chess_id = player_game_serialized[0]
+        player_deserialized = Player.deserialize(national_chess_id)
+"""
+
 
 
 

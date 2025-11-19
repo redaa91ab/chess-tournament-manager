@@ -23,8 +23,7 @@ class Player:
         self.national_chess_id = national_chess_id
         self.name = name   
         self.surname = surname
-        self.birthdate = birthdate
-        
+        self.birthdate = birthdate        
 
     def serialize(self):
         """Return a dict"""
@@ -39,21 +38,22 @@ class Player:
     @classmethod
     def deserialize(cls, national_chess_id):
         """Return the player object from the national chess id entered"""
-        players_list = Player.deserialize_all_players()
-        player = next((player for player in players_list if player.national_chess_id == national_chess_id), None)
-        return player
+        for player in players_table.all():
+            if player["national_chess_id"] == national_chess_id :
+                national_chess_id = player["national_chess_id"]
+                name = player["name"]
+                surname = player["surname"]
+                birthdate = player["birthdate"]
+                player = Player(national_chess_id, name, surname, birthdate)
+                return player
+    
+        return None
     
     @classmethod
     def deserialize_all_players(cls) :
         """ return a list of all players object """
-        players = []
-        for player in players_table.all():
-            national_chess_id = player["national_chess_id"]
-            name = player["name"]
-            surname = player["surname"]
-            birthdate = player["birthdate"]
-            player = Player(national_chess_id, name, surname, birthdate)     
-            players.append(player)
+
+        players = [Player.deserialize(player_serialized["national_chess_id"]) for player_serialized in players_table.all()]
 
         return players
 

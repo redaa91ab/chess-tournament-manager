@@ -60,12 +60,13 @@ class TournamentsController:
         """
         self.view.show_message("\n[bold green]Create tournament[/bold green]\n")
         self.view.show_message("Enter the new tournament details below : ")
+        tournament_id = Tournament.generate_tournament_id()
         tournament_name = self.view.get_input("Tournament name : ")
         place = self.view.get_input("Place : ")
         start_date = self._get_valid_date("Start date (DD/MM/YYYY) : ")
         end_date = self._get_valid_date("End date (DD/MM/YYYY) : ")
         number_of_rounds = self._get_valid_number_of_rounds()
-        tournament = Tournament(tournament_name, place, start_date, end_date, number_of_rounds)
+        tournament = Tournament(tournament_id, tournament_name, place, start_date, end_date, number_of_rounds)
         tournament.save_json()
 
 
@@ -303,15 +304,15 @@ class RoundController :
                     for game in actual_round.games_list :
                         winner = self.view.update_game_result(game)
                         if winner == game.player1 :
-                                game.player1_score =1
+                                game.score_player1 =1
                                 game.player1.total_score +=1
                         elif winner == game.player2 :
-                                game.player2_score =1
+                                game.score_player2 =1
                                 game.player2.total_score +=1
                         elif winner == None :
-                            game.player1_score =0.5
+                            game.score_player1 =0.5
                             game.player1.total_score +=0.5
-                            game.player2_score =0.5
+                            game.score_player2 =0.5
                             game.player2.total_score +=0.5
 
                     end_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
