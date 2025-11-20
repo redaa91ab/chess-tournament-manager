@@ -83,18 +83,18 @@ class TournamentsController:
                     continue
                 elif user_choice == 2:
                     player = self.players_controller.add_player(national_chess_id)
-                    tournament.players.append(PlayerTournament(player, 0.0))
+                    tournament.players.append(PlayerTournament(player.national_chess_id, player.name, player.surname,player.birthdate, 0.0))
                     tournament.save_json()
                     self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added to the tournament !")
                     break
             elif player :
-                player_nid = player.national_chess_id
-                nid_players_tournament = [player.player.national_chess_id for player in tournament.players]
-                if player_nid in nid_players_tournament :
+                nid_player = player.national_chess_id
+                nid_players_tournament = [player.national_chess_id for player in tournament.players]
+                if nid_player in nid_players_tournament :
                     self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) is already saved in the tournament.")
                     break
                 else :
-                    tournament.players.append(PlayerTournament(player, 0.0))
+                    tournament.players.append(PlayerTournament(player.national_chess_id, player.name, player.surname,player.birthdate, 0.0))
                     tournament.save_json()
                     self.view.show_message(f"\n{player.name} {player.surname} ({player.national_chess_id}) was successfully added to the tournament !")
                     break
@@ -144,6 +144,7 @@ class TournamentsController:
                 tournament.save_json()
                 self.view.display_rank_players(tournament)
                 self.view.show_message(f"\n Tournament officialy finish. You can view the rank above")
+                break
    
 
 
@@ -303,17 +304,17 @@ class RoundController :
                 elif actual_round.state == "in_progress" :
                     for game in actual_round.games_list :
                         winner = self.view.update_game_result(game)
-                        if winner == game.player1 :
-                                game.score_player1 =1
-                                game.player1.total_score +=1
-                        elif winner == game.player2 :
-                                game.score_player2 =1
-                                game.player2.total_score +=1
+                        if winner == game.player1_tournament :
+                                game.score_player1 = 1
+                                game.player1_tournament.total_points += 1
+                        elif winner == game.player2_tournament :
+                                game.score_player2 = 1
+                                game.player2_tournament.total_points += 1
                         elif winner == None :
-                            game.score_player1 =0.5
-                            game.player1.total_score +=0.5
-                            game.score_player2 =0.5
-                            game.player2.total_score +=0.5
+                            game.score_player1 = 0.5
+                            game.player1_tournament.total_points += 0.5
+                            game.score_player2 = 0.5
+                            game.player2_tournament.total_points += 0.5
 
                     end_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
                     actual_round.end_date = end_date
@@ -322,3 +323,4 @@ class RoundController :
                         TournamentsController(self.view).finish_tournament(tournament)
                     tournament.save_json()
                     break
+

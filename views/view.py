@@ -70,8 +70,6 @@ class View:
         console.print("2) Add players")
         console.print("[red]3) Back [/red]")
 
-
-
     def show_start_tournament_menu(self):
         """
         Display the start tournament menu
@@ -105,21 +103,21 @@ class View:
 
         games_list = round.games_list
         for i, game in enumerate(games_list, 1) :
-            player1 = game.player1.player
-            player2 = game.player2.player
+            player1 = game.player1_tournament
+            player2 = game.player2_tournament
             console.print(f"{i}) {player1.name} ({player1.national_chess_id}) vs {player2.name} ({player2.national_chess_id})")
 
     
     def update_game_result(self, game) :
         """return the winner of the game"""
         console.print("[bold green]\nUpdate game\n[/bold green]")
-        player1 = game.player1
-        player2 = game.player2
+        player1 = game.player1_tournament
+        player2 = game.player2_tournament
 
         while True :
-            console.print(f"{1}) {player1.player.name} ({player1.player.national_chess_id})")
+            console.print(f"{1}) {player1.name} ({player1.national_chess_id})")
             console.print("VS")
-            console.print(f"{2}) {player2.player.name} ({player2.player.national_chess_id})")
+            console.print(f"{2}) {player2.name} ({player2.national_chess_id})")
             console.print("")
             console.print("3) Draw")
         
@@ -185,15 +183,15 @@ class View:
         console.print(f"\n", tree)
 
     def display_rank_players(self, tournament) :
-        players_sorted = sorted(tournament.players, key=lambda player : player.score, reverse=True)
+        players_sorted = sorted(tournament.players, key=lambda player : player.total_points, reverse=True)
         table = Table(title = "[bold green]Players rank[/bold green]")
         table.add_column("Rank place", justify="center")
         table.add_column("Player", justify="center")
         table.add_column("Score", justify="center")
 
         for i, player in enumerate(players_sorted, 1) :
-            player_string = (f"{player.player.name} {player.player.surname}({player.player.national_chess_id})")
-            table.add_row(str(i), player_string , str(player.score))
+            player_string = (f"{player.name} {player.surname}({player.national_chess_id})")
+            table.add_row(str(i), player_string , str(player.total_points))
 
         console.print(f"\n", table)
 

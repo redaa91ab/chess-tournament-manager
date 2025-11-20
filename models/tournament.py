@@ -102,7 +102,7 @@ class Tournament:
     def get_players_sorted(self):
         """ return a list of the players of the tournament sorted from the highest score to the lowest"""
         players_list = self.players
-        players_list_sorted = sorted(players_list, key=lambda player: player.total_score)
+        players_list_sorted = sorted(players_list, key=lambda player: player.total_points)
         return players_list_sorted
     
 
@@ -170,10 +170,10 @@ class Round :
 
         previous_opponents = []
         for game in self.games_list :
-                if game.player1 == player :
-                    previous_opponents.append(game.player2)
-                elif game.player2 == player :
-                    previous_opponents.append(game.player1)
+                if game.player1_tournament == player :
+                    previous_opponents.append(game.player2_tournament)
+                elif game.player2_tournament == player :
+                    previous_opponents.append(game.player1_tournament)
         return previous_opponents
     
 
@@ -183,7 +183,7 @@ class Game :
 
     It provides methods to serialize and deseralize the game
     """
-    def __init__(self, player1_tournament, score_player1_tournament, player2_tournament, score_player2_tournament):
+    def __init__(self, player1_tournament, score_player1, player2_tournament, score_player2):
         """
         Initialize a game with the provided details.
 
@@ -192,16 +192,16 @@ class Game :
             player2 : second PlayerTournament object
         """
         self.player1_tournament = player1_tournament
-        self.score_player1_tournament = score_player1_tournament
-        self.score_player2_tournament = score_player2_tournament
+        self.score_player1 = score_player1
         self.player2_tournament = player2_tournament
+        self.score_player2 = score_player2
 
    
     def serialize(self):
         """ return a dict of the game object """
         serialized_data = (
-            [self.player1_tournament.player.national_chess_id, self.score_player1_tournament],
-            [self.player2_tournament.player.national_chess_id, self.score_player2_tournament]
+            [self.player1_tournament.national_chess_id, self.score_player1],
+            [self.player2_tournament.national_chess_id, self.score_player2]
             )
         return serialized_data
     
@@ -210,11 +210,11 @@ class Game :
         "return a game object"
         player1_national_chess_id = game_serialized[0][0]
         
-        player1 = PlayerTournament.deserialize(player1_national_chess_id, players)
+        player1 = PlayerTournament.deserialize_by_nid(player1_national_chess_id, players)
         score_player1 = game_serialized[0][1]
 
         player2_national_chess_id = game_serialized[1][0]
-        player2 = Player.deserialize(player2_national_chess_id)
+        player2 = PlayerTournament.deserialize_by_nid(player2_national_chess_id, players)
         score_player2 = game_serialized[1][1]
 
         game_deserialized = Game(player1, score_player1, player2, score_player2)
@@ -242,7 +242,7 @@ class PlayerTournament(Player) :
     def serialize(self):
         """ return a dict of the PlayerTournament object"""
         serialized_data = [
-            self.player.national_chess_id,
+            self.national_chess_id,
             self.total_points
             ]
         return serialized_data
@@ -255,7 +255,7 @@ class PlayerTournament(Player) :
         player = Player.deserialize(national_chess_id)
         total_points = player_tournament_serialized[1]
 
-        player_tournament_deserialized = PlayerTournament(player, total_points)
+        player_tournament_deserialized = PlayerTournament(player.national_chess_id, player.name, player.surname,player.birthdate, total_points)
         
         return player_tournament_deserialized
     
