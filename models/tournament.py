@@ -12,8 +12,8 @@ class Tournament:
     retrieve or update tournament information.
     """
 
-    def __init__(self, tournament_id, tournament_name, place, start_date, end_date = None, number_of_rounds = 4,current_round = 0, players = [], rounds = [],
-                manager_comment = None, state = "not_started"):
+    def __init__(self, tournament_id, tournament_name, place, start_date, end_date, number_of_rounds, manager_comment = None, current_round = 0, 
+                 players = [], rounds = [], state = "not_started"):
         """
         Initialize a Tournament instance with the provided details.
 
@@ -36,10 +36,10 @@ class Tournament:
         self.start_date = start_date
         self.end_date = end_date
         self.number_of_rounds = number_of_rounds
+        self.manager_comment = manager_comment
         self.current_round = current_round
         self.players = players
         self.rounds = rounds
-        self.manager_comment = manager_comment
         self.state = state
 
     @classmethod
@@ -56,10 +56,10 @@ class Tournament:
             "start_date" : self.start_date,
             "end_date": self.end_date,
             "number_of_rounds": self.number_of_rounds,
+            "manager_comment" : self.manager_comment,
             "current_round" : self.current_round,
             "players": [player.serialize() for player in self.players],
             "rounds" : [round.serialize() for round in self.rounds],
-            "manager_comment" : self.manager_comment,
             "state": self.state
         }
         return serialized_data
@@ -79,14 +79,14 @@ class Tournament:
         start_date = tournament_serialized["start_date"]
         end_date = tournament_serialized["end_date"]
         number_of_rounds = tournament_serialized["number_of_rounds"]
+        manager_comment = tournament_serialized["manager_comment"]
         current_round = tournament_serialized["current_round"]
         players = [PlayerTournament.deserialize(player) for player in tournament_serialized["players"]]
         rounds = [Round.deserialize(round, players) for round in tournament_serialized["rounds"]]
-        manager_comment = tournament_serialized["manager_comment"]
         state = tournament_serialized["state"]
 
-        tournament = Tournament(tournament_id, tournament_name, place, start_date, end_date, number_of_rounds, current_round, players, rounds,
-                                manager_comment, state)
+        tournament = Tournament(tournament_id, tournament_name, place, start_date, end_date, number_of_rounds, manager_comment, current_round, players, rounds,
+                                state)
         
         return tournament
 

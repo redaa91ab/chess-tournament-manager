@@ -99,7 +99,7 @@ class View:
         console.print(f"{len(tournaments)+1})[red] Back[/red]")
 
     def show_games_list(self, round):
-        console.print("[bold green]\nGames\n[/bold green]")
+        console.print(f"[bold green]\n{round.name}\n[/bold green]")
 
         games_list = round.games_list
         for i, game in enumerate(games_list, 1) :
@@ -108,9 +108,9 @@ class View:
             console.print(f"{i}) {player1.name} ({player1.national_chess_id}) vs {player2.name} ({player2.national_chess_id})")
 
     
-    def update_game_result(self, game) :
+    def update_game_result(self, round_name, game) :
         """return the winner of the game"""
-        console.print("[bold green]\nUpdate game\n[/bold green]")
+        console.print(f"[bold green]\n{round_name}\n[/bold green]")
         player1 = game.player1_tournament
         player2 = game.player2_tournament
 
@@ -145,29 +145,31 @@ class View:
         console.print("2) Display tournament rounds and games")
         console.print("3)[red] Back[/red]")
 
-    def display_all_players(self, players) :
+    def display_players(self, players) :
+        players_sorted = sorted(players, key=lambda p: p.surname)
         table = Table(title="[bold green]\nPlayers[/bold green]")
-        table.add_column("National Chess ID", justify="center")
-        table.add_column("Name", justify="center")
         table.add_column("Surname", justify="center")
+        table.add_column("Name", justify="center")
+        table.add_column("National Chess ID", justify="center")
         table.add_column("Birthdate", justify="center")
 
-        for player in players :
-            table.add_row(player.national_chess_id, player.name, player.surname, player.birthdate)
+        for player in players_sorted :
+            table.add_row(player.surname,player.name, player.national_chess_id, player.birthdate)
 
         console.print(table)
 
-    def display_players_tournament(self, tournament):
+    def display_players_tournament(self, players):
+        players_sorted = sorted(players, key=lambda p: p.surname)
         table = Table(title="[bold green]\nPlayers tournament[/bold green]")
-        table.add_column("National Chess ID", justify="center")
-        table.add_column("Name", justify="center")
         table.add_column("Surname", justify="center")
+        table.add_column("Name", justify="center")
+        table.add_column("National Chess ID", justify="center")
         table.add_column("Birthdate", justify="center")
-        table.add_column("Score tournament", justify="center")
+        table.add_column("Total points", justify="center")
 
 
-        for player in tournament.players :
-            table.add_row(player.player.national_chess_id, player.player.name, player.player.surname, player.player.birthdate, str(player.score))
+        for player in players_sorted :
+            table.add_row(player.surname, player.name, player.national_chess_id, player.birthdate, str(player.total_points))
 
         console.print(table)
 
@@ -176,9 +178,9 @@ class View:
         for round in tournament.rounds :
             round_tree = tree.add(f"{round.name}")
             for game in round.games_list :
-                player1 = game.player1.player
-                player2 = game.player2.player
-                game_tree = round_tree.add(f"{player1.name} {player1.surname}({player1.national_chess_id}) VS {player2.name} {player2.surname}({player2.national_chess_id})")
+                player1 = game.player1_tournament
+                player2 = game.player2_tournament
+                round_tree.add(f"{player1.name} {player1.surname}({player1.national_chess_id}) VS {player2.name} {player2.surname}({player2.national_chess_id})")
 
         console.print(f"\n", tree)
 

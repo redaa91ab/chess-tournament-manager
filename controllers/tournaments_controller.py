@@ -66,7 +66,8 @@ class TournamentsController:
         start_date = self._get_valid_date("Start date (DD/MM/YYYY) : ")
         end_date = self._get_valid_date("End date (DD/MM/YYYY) : ")
         number_of_rounds = self._get_valid_number_of_rounds()
-        tournament = Tournament(tournament_id, tournament_name, place, start_date, end_date, number_of_rounds)
+        manager_comment = self.view.get_input("Manager comment : ")
+        tournament = Tournament(tournament_id, tournament_name, place, start_date, end_date, number_of_rounds, manager_comment)
         tournament.save_json()
 
 
@@ -151,7 +152,7 @@ class TournamentsController:
     def reports_menu(self) :
         while True :
             self.view.reports_menu()
-            user_choice = self._get_valid_choice(2)
+            user_choice = self._get_valid_choice(3)
             if user_choice == 1 :
                 self.players_controller.display_all_players()
             elif user_choice == 2 :
@@ -173,7 +174,7 @@ class TournamentsController:
             self.view.reports_tournament_menu()
             user_choice = self._get_valid_choice(3)
             if user_choice == 1 :
-                self.view.display_players_tournament(tournament)
+                self.view.display_players_tournament(tournament.players)
             elif user_choice == 2 :
                 self.view.display_tournament_rounds(tournament)
                 self.view.display_rank_players(tournament)
@@ -303,7 +304,7 @@ class RoundController :
                     break
                 elif actual_round.state == "in_progress" :
                     for game in actual_round.games_list :
-                        winner = self.view.update_game_result(game)
+                        winner = self.view.update_game_result(actual_round.name, game)
                         if winner == game.player1_tournament :
                                 game.score_player1 = 1
                                 game.player1_tournament.total_points += 1
