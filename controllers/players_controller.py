@@ -26,12 +26,12 @@ class PlayersController:
         """
         while True :
             self.view.show_manage_players_menu()
-            user_choice = self.view.get_input("\nChoose an option : ")
-            if user_choice == "1" or user_choice == "1)":
+            user_choice = self.get_valid_choice(3)
+            if user_choice == 1 :
                 self.display_all_players()
-            elif user_choice == "2" or user_choice == "2)":
+            elif user_choice == 2 :
                 self.add_player()
-            elif user_choice == "3" or user_choice == "3)":
+            elif user_choice == 3 :
                 break
 
     def display_all_players(self):
@@ -48,7 +48,7 @@ class PlayersController:
 
         self.view.show_message("\nEnter the new player details below :")
         if national_chess_id is None :
-            national_chess_id = self._get_valid_national_chess_id()
+            national_chess_id = self.get_valid_national_chess_id()
 
         player = Player.deserialize(national_chess_id)
         if player :
@@ -56,14 +56,25 @@ class PlayersController:
         elif player is None :
             name = self.view.get_input("Name : ")
             surname = self.view.get_input("Surname : ")
-            birthdate = self._get_valid_birthdate()
+            birthdate = self.get_valid_birthdate()
             player = Player(national_chess_id, name, surname, birthdate)
             player.save_json()
             self.view.show_message(f"\n{name} {surname} ({national_chess_id}) was successfully added to the database !")
             return player
 
+
+    def get_valid_choice(self, number_of_choice) :
+        while True :
+            try :
+                user_choice = int(self.view.get_input("\nSelect an option : "))
+                if 1 <= user_choice <= number_of_choice :
+                    return user_choice
+                else :
+                    self.view.show_message("Please select a valid option")
+            except ValueError:
+                self.view.show_message("Please enter a number")
     
-    def _get_valid_national_chess_id(self) :
+    def get_valid_national_chess_id(self) :
         """Return a correct national chess id"""
 
         while True:
@@ -75,7 +86,7 @@ class PlayersController:
                 self.view.show_message("The ID should start with 2 letters and 5 numbers. Try again")
 
 
-    def _get_valid_birthdate(self) :
+    def get_valid_birthdate(self) :
         """Return a valid birthdate"""
         while True : 
             birthdate = self.view.get_input("Birthdate : ")

@@ -30,19 +30,16 @@ class AppController:
 
         while True :
             self.view.show_main_menu()
-            user_choice = self.view.get_input("\nChoose an option : ")
+            user_choice = self.tournament.get_valid_choice(4)
 
-            if user_choice in ["1", "1)"] :
+            if user_choice == 1 :
                 self.tournament.manage_tournaments()    
-            elif user_choice in ["2", "2)"] :
+            elif user_choice == 2 :
                 self.players.manage_players()
-            elif user_choice in ["3", "3)"] :
+            elif user_choice == 3 :
                 self.tournament.reports_menu()
-            elif user_choice in ["4", "4)"]:
+            elif user_choice == 4 :
                 break
-            else :
-                self.view.show_message("Please choose an option between 1 and 4.")
-
 
 
     

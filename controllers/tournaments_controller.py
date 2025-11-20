@@ -30,18 +30,18 @@ class TournamentsController:
 
         while True :
             self.view.show_tournaments_menu()
-            user_choice = self._get_valid_choice(4)
+            user_choice = self.get_valid_choice(4)
             if user_choice == 1 :
                 self.create()
             elif user_choice == 2 :
-                tournament = self._select_tournament()
+                tournament = self.select_tournament()
                 if tournament :
                     if tournament.state == "finished" :
                         self.view.show_message("This tournament is finished. You can't add players.")
                     else :
                         self.add_player_tournament(tournament)
             elif user_choice == 3:
-                tournament = self._select_tournament()
+                tournament = self.select_tournament()
                 if tournament :
                     if tournament.state == "finished" :
                         self.view.show_message("This tournament is finished. You can't start a tournament.")
@@ -63,9 +63,9 @@ class TournamentsController:
         tournament_id = Tournament.generate_tournament_id()
         tournament_name = self.view.get_input("Tournament name : ")
         place = self.view.get_input("Place : ")
-        start_date = self._get_valid_date("Start date (DD/MM/YYYY) : ")
-        end_date = self._get_valid_date("End date (DD/MM/YYYY) : ")
-        number_of_rounds = self._get_valid_number_of_rounds()
+        start_date = self.get_valid_date("Start date (DD/MM/YYYY) : ")
+        end_date = self.get_valid_date("End date (DD/MM/YYYY) : ")
+        number_of_rounds = self.get_valid_number_of_rounds()
         manager_comment = self.view.get_input("Manager comment : ")
         tournament = Tournament(tournament_id, tournament_name, place, start_date, end_date, number_of_rounds, manager_comment)
         tournament.save_json()
@@ -79,7 +79,7 @@ class TournamentsController:
             player = Player.deserialize(national_chess_id)
             if player is None:
                 self.view.show_message("\nThis player is not in the database :\n1) Type again \n2) Create a new player \n")
-                user_choice = self._get_valid_choice(2)
+                user_choice = self.get_valid_choice(2)
                 if user_choice == 1:
                     continue
                 elif user_choice == 2:
@@ -106,7 +106,7 @@ class TournamentsController:
 
         while True :
             self.view.show_start_tournament_menu()
-            user_choice = self._get_valid_choice(4)
+            user_choice = self.get_valid_choice(4)
             if user_choice == 1 :
                 self.round_controller.create_round_menu(tournament)
             elif user_choice == 2 :
@@ -134,7 +134,7 @@ class TournamentsController:
                                         "\n1) Finish the tournament earlier"
                                         "\n2)[red] Back [/red] \n"
                                         )
-                user_choice = self._get_valid_choice(2)
+                user_choice = self.get_valid_choice(2)
                 if user_choice == 1 :
                     pass
                 elif user_choice == 2 :
@@ -152,7 +152,7 @@ class TournamentsController:
     def reports_menu(self) :
         while True :
             self.view.reports_menu()
-            user_choice = self._get_valid_choice(3)
+            user_choice = self.get_valid_choice(3)
             if user_choice == 1 :
                 self.players_controller.display_all_players()
             elif user_choice == 2 :
@@ -163,7 +163,7 @@ class TournamentsController:
 
     def reports_tournaments(self) :
         while True :
-            tournament = self._select_tournament()
+            tournament = self.select_tournament()
             if tournament :
                 self.report_tournament(tournament)
             else :
@@ -172,7 +172,7 @@ class TournamentsController:
     def report_tournament(self, tournament):
         while True :
             self.view.reports_tournament_menu()
-            user_choice = self._get_valid_choice(3)
+            user_choice = self.get_valid_choice(3)
             if user_choice == 1 :
                 self.view.display_players_tournament(tournament.players)
             elif user_choice == 2 :
@@ -182,14 +182,14 @@ class TournamentsController:
                 break
 
 
-    def _select_tournament(self) :
+    def select_tournament(self) :
         """Show the list of all tournaments and the user select
         Return the tournament object selected """
 
         while True:
             tournaments = Tournament.deserialize_all_tournaments()
             self.view.show_select_tournament(tournaments)
-            user_choice = self._get_valid_choice(len(tournaments)+1)
+            user_choice = self.get_valid_choice(len(tournaments)+1)
 
             if user_choice == len(tournaments)+1:
                 break
@@ -198,10 +198,10 @@ class TournamentsController:
                 tournament = tournaments[tournament_index]
                 return tournament
             
-    def _get_valid_choice(self, number_of_choice) :
+    def get_valid_choice(self, number_of_choice) :
         while True :
             try :
-                user_choice = int(self.view.get_input("Select an option : "))
+                user_choice = int(self.view.get_input("\nSelect an option : "))
                 if 1 <= user_choice <= number_of_choice :
                     return user_choice
                 else :
@@ -209,7 +209,7 @@ class TournamentsController:
             except ValueError:
                 self.view.show_message("Please enter a number")
             
-    def _get_valid_number_of_rounds(self) :
+    def get_valid_number_of_rounds(self) :
         "return a valid number of rounds (int)"
         while True :
             number_of_rounds = self.view.get_input("Number of rounds : ")
@@ -222,7 +222,7 @@ class TournamentsController:
             except ValueError as e:
                 self.view.show_message(f"Invalid input: {e}")
 
-    def _get_valid_date(self, input) :
+    def get_valid_date(self, input) :
         "return a valid number of rounds (int)"
         while True :
             date = self.view.get_input(input)

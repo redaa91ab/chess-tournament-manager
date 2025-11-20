@@ -174,14 +174,15 @@ class View:
         console.print(table)
 
     def display_tournament_rounds(self, tournament):
-        tree = Tree(f"[bold green]{tournament.tournament_name}[/bold green]")
+        tree = Tree(f"[bold green]{tournament.tournament_name}[/bold green]\n")
         for round in tournament.rounds :
-            round_tree = tree.add(f"{round.name}")
+            round_tree = tree.add(f"[bold green]{round.name}[/bold green]\n")
             for game in round.games_list :
                 player1 = game.player1_tournament
                 player2 = game.player2_tournament
-                round_tree.add(f"{player1.name} {player1.surname}({player1.national_chess_id}) VS {player2.name} {player2.surname}({player2.national_chess_id})")
-
+                game_tree = round_tree.add(f"{player1.name} {player1.surname}({player1.national_chess_id}) VS {player2.name} {player2.surname}({player2.national_chess_id})")
+                game_tree.add(f"Score {player1.name} : {game.score_player1}")
+                game_tree.add(f"Score {player2.name} : {game.score_player2}\n")
         console.print(f"\n", tree)
 
     def display_rank_players(self, tournament) :
@@ -189,11 +190,10 @@ class View:
         table = Table(title = "[bold green]Players rank[/bold green]")
         table.add_column("Rank place", justify="center")
         table.add_column("Player", justify="center")
-        table.add_column("Score", justify="center")
+        table.add_column("Total points", justify="center")
 
         for i, player in enumerate(players_sorted, 1) :
-            player_string = (f"{player.name} {player.surname}({player.national_chess_id})")
-            table.add_row(str(i), player_string , str(player.total_points))
+            table.add_row(str(i), (f"{player.name} {player.surname} ({player.national_chess_id})") , str(player.total_points))
 
         console.print(f"\n", table)
 
