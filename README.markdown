@@ -4,7 +4,7 @@
 Chess Tournament Manager est une application locale qui vous permettra de :
 - **Gérer les tournois** : Créer des tournois, générer des matchs et entrer les résultats dans l'application, toutes est stocké dans un fichier JSON, et le tournoi peut être repris à tout moments
 - **Gérer les joueurs** : Enregistrer des joueurs et toute leurs informations dans une base de données JSON, les rapports sont consultable à tout moment dans l'application
-- **RAPPORTS** : Consulter les détails des tournois enregistrés, l'historique des matchs, les joueurs ainsi que tout autres informations relatives aux tournois.
+- **Rapports** : Consulter les détails des tournois enregistrés, l'historique des matchs, les joueurs ainsi que tout autres informations relatives aux tournois.
 
 Chess Tournament Manager est programme python autonome et hors ligne qui peut être lancé depuis la console.
 
