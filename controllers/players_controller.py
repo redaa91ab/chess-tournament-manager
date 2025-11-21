@@ -5,7 +5,7 @@ import re
 class PlayersController: 
     """
     A controller class for managing player. 
-    It provides methods to display all the players and adding new players to the database
+    It provides methods to show manage players menu to display the players and add new players to the database
     """
 
     def __init__(self, view):
@@ -13,17 +13,13 @@ class PlayersController:
         Initialize a PlayersController instance.
 
         Args:
-            view: An instance of the View class
-            parent: app_controller.py
+            view: View class instance
         """
         self.view = view
 
 
     def manage_players(self):
-        """
-        Display the player management menu, collect the user selection and delegates tasks to the PlayersController for
-        listing or adding players, or go back.
-        """
+        """ Display the player management menu, and direct the tasks to the other methods """
         while True :
             self.view.show_manage_players_menu()
             user_choice = self.get_valid_choice(3)
@@ -35,15 +31,13 @@ class PlayersController:
                 break
 
     def display_all_players(self):
-        """
-        Display the list of all players using the method return_players of the Player model.
-        """
+        """ Display the list of all players using the deserialize_all_players method of the Player model """
         players = Player.deserialize_all_players()
         self.view.display_players(players)
 
     def add_player(self, national_chess_id = None) :
         """
-        Collect the player details, then use the methods save_json of the Player model.
+        Collect the player details, then use the save_json method of the Player model.
         """
 
         self.view.show_message("\nEnter the new player details below :")
@@ -64,6 +58,7 @@ class PlayersController:
 
 
     def get_valid_choice(self, number_of_choice) :
+        """ return a valid choice number between the range of the number of choice """
         while True :
             try :
                 user_choice = int(self.view.get_input("\nSelect an option : "))
@@ -75,7 +70,7 @@ class PlayersController:
                 self.view.show_message("Please enter a number")
     
     def get_valid_national_chess_id(self) :
-        """Return a correct national chess id"""
+        """Return a valid national chess id"""
 
         while True:
             input = self.view.get_input("National chess ID: ")

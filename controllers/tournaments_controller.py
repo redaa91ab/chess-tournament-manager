@@ -6,7 +6,7 @@ from datetime import datetime
 class TournamentsController:
     """
     A controller class for managing tournament.
-    It provides methods to create, select or modify a tournament
+    It provides methods to create, update, or play a tournament
     """
 
     def __init__(self, view):
@@ -14,9 +14,9 @@ class TournamentsController:
         Initialize a TournamentsController instance.
 
         Args:
-            view: An instance of the View class
-            players_controller : An instance of the Players Controller
-            round_controller : An instance of the Round Controller
+            view: View class instance
+            players_controller : Players Controller instance
+            round_controller : Round Controller instance
         """
         self.view = view
         self.players_controller = PlayersController(self.view)
@@ -25,7 +25,7 @@ class TournamentsController:
     def manage_tournaments(self):
         """
         Display the tournament management menu and offer 4 option : 
-        create tournament, add players, start tournament, or going back.
+        create tournament, add players, play a tournament, or going back.
         """
 
         while True :
@@ -44,20 +44,18 @@ class TournamentsController:
                 tournament = self.select_tournament()
                 if tournament :
                     if tournament.state == "finished" :
-                        self.view.show_message("This tournament is finished. You can't start a tournament.")
+                        self.view.show_message("This tournament is finished. You can't play a tournament.")
                     elif len(tournament.players) < 4 :
-                        self.view.show_message(f"You need at least 4 players to start a tournament.  Current number of players = {len(tournament.players)}")
+                        self.view.show_message(f"You need at least 4 players to play a tournament.  Current number of players = {len(tournament.players)}")
                     elif len(tournament.players) %2 != 0 :
-                        self.view.show_message(f"You need a even number of players to start. Current number of players = {len(tournament.players)}")
+                        self.view.show_message(f"You need a even number of players to play. Current number of players = {len(tournament.players)}")
                     else :
-                        self.start_tournament(tournament)
+                        self.play_tournament(tournament)
             elif user_choice == 4 : 
                 break
 
     def create(self):
-        """
-        Create a tournament object and save it to JSON
-        """
+        """ Create tournament instance and save it to JSON """
         self.view.show_message("\n[bold green]Create tournament[/bold green]\n")
         self.view.show_message("Enter the new tournament details below : ")
         tournament_id = Tournament.generate_tournament_id()
@@ -72,8 +70,8 @@ class TournamentsController:
 
 
     def add_player_tournament(self, tournament) :
-        """ Ask for national_chess_id, retrieve the player and create a PlayerTournament object then save it in players in the tournament"""
 
+        """ Retrieve player data from national_chess_id input, create a PlayerTournament instance and save it in the players list in the tournament """
         while True : 
             national_chess_id = self.players_controller._get_valid_national_chess_id()
             player = Player.deserialize(national_chess_id)
@@ -101,11 +99,11 @@ class TournamentsController:
                     break
                 
 
-    def start_tournament(self, tournament):
-        """ Display start_tournament menu, then either create a new round, update the actual round or finish the tournament"""
+    def play_tournament(self, tournament):
+        """ Display play_tournament menu, then directs to create a new round, update the actual round or finish the tournament """
 
         while True :
-            self.view.show_start_tournament_menu()
+            self.view.show_play_tournament_menu()
             user_choice = self.get_valid_choice(4)
             if user_choice == 1 :
                 self.round_controller.create_round_menu(tournament)
@@ -118,7 +116,7 @@ class TournamentsController:
 
         
     def finish_tournament(self, tournament) :
-        """ D"""
+        """ Verify that the tournament can be finished, then change the state to "finished" and display the results of the tournament"""
 
         while True :
             rounds = tournament.rounds
@@ -148,28 +146,22 @@ class TournamentsController:
                 break
    
 
-
     def reports_menu(self) :
+        """ Main menu of the reports, offer 3 options : Display all players, display all tournaments, or go back"""
         while True :
             self.view.reports_menu()
             user_choice = self.get_valid_choice(3)
             if user_choice == 1 :
                 self.players_controller.display_all_players()
             elif user_choice == 2 :
-                self.reports_tournaments()
+                tournament = self.select_tournament()
+                if tournament :
+                    self.reports_tournament(tournament)
             elif user_choice == 3 :
                 break
 
-
-    def reports_tournaments(self) :
-        while True :
-            tournament = self.select_tournament()
-            if tournament :
-                self.report_tournament(tournament)
-            else :
-                break
-
-    def report_tournament(self, tournament):
+    def reports_tournament(self, tournament):
+        """ Menu of one tournament reports, offer 3 options : Display all the players of the tournament, display the history of the tournament, or going back"""
         while True :
             self.view.reports_tournament_menu()
             user_choice = self.get_valid_choice(3)
@@ -183,7 +175,7 @@ class TournamentsController:
 
 
     def select_tournament(self) :
-        """Show the list of all tournaments and the user select
+        """Show the list of all tournaments
         Return the tournament object selected """
 
         while True:
@@ -199,6 +191,7 @@ class TournamentsController:
                 return tournament
             
     def get_valid_choice(self, number_of_choice) :
+        """return a valid choice number between the range of the number of choice"""
         while True :
             try :
                 user_choice = int(self.view.get_input("\nSelect an option : "))
@@ -210,7 +203,7 @@ class TournamentsController:
                 self.view.show_message("Please enter a number")
             
     def get_valid_number_of_rounds(self) :
-        "return a valid number of rounds (int)"
+        """return a valid number of rounds (int and > 0)"""
         while True :
             number_of_rounds = self.view.get_input("Number of rounds : ")
             try:
@@ -223,7 +216,7 @@ class TournamentsController:
                 self.view.show_message(f"Invalid input: {e}")
 
     def get_valid_date(self, input) :
-        "return a valid number of rounds (int)"
+        """ return a valid date """
         while True :
             date = self.view.get_input(input)
             try:
@@ -234,17 +227,20 @@ class TournamentsController:
 
 class RoundController :
     """
-    A controller class for managing rounds.
-    It provides methods to create or update rounds
+    A controller class for managing rounds
+    It provides methods to create or update a round
     """
     
     def __init__(self, view):
+        """Initialize a RoundController instance
+
+        args :
+            view : View class instance
+        """
         self.view = view
 
     def create_round_menu(self, tournament) :
-        """
-        Display the games of the new round
-        """
+        """ Create a round and display the next games to play """
 
         while True :
             rounds = tournament.rounds
@@ -268,6 +264,7 @@ class RoundController :
  
 
     def generate_round(self, tournament) :
+        """ return a round model instance, based on the requirements """
 
         games_list = []
         players = tournament.get_players_sorted()
@@ -289,6 +286,7 @@ class RoundController :
         return round
 
     def update_results_games(self, tournament):
+        """ Ask the user the results, update the score of the game in the round model instance"""
     
         while True :
             rounds = tournament.rounds

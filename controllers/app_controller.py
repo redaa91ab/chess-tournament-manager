@@ -14,7 +14,11 @@ class AppController:
         """
         Initialize a AppController instance.
 
-        Creates a View instance for display and input
+        args :
+            self.view : View instance for display and input
+            self.players : PlayersController instance, for handling players menu
+            self. TournamentsController instance, for handling tournaments menu
+
         """
         self.view = View()
         self.players = PlayersController(self.view)
@@ -24,7 +28,7 @@ class AppController:
         """
         Run the main application.
 
-        Displays the main menu, collect user input, and directs the user to
+        Displays the main menu and directs the user to
         manage tournaments, players, reports, or exit.
         """
 

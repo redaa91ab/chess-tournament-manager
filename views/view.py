@@ -11,24 +11,13 @@ class View:
     """
     
     def get_input(self, message):
-        """
-        Prompt the user for input and return the entered value.
-
-        Args:
-            message : The prompt message to display
-
-        Returns:
-            The value entered by the user
-        """
+        """ Prompt the user for input and return the value """
         self.message = message
         return input(message)
 
     def show_message(self, message):
         """
-        Display a message
-
-        Args:
-            message : The message to display.
+        Display the message entered
         """
         console.print(message)
 
@@ -36,7 +25,7 @@ class View:
         """
         Display the main menu.
 
-        Shows options for managing tournaments, managing players, shows reports, or exit.
+        Display options for managing tournaments, managing players, shows reports, or exit.
         """
 
         console.print("[bold green]\nMAIN MENU :\n[/bold green]")
@@ -49,40 +38,39 @@ class View:
         """
         Display the tournament management menu.
 
-        Shows options for creating a tournament, adding players to a tournament, playing
+        Displays options for creating a tournament, add players to a tournament, play
         a tournament, or go back.
         """
         console.print("\n[bold green]Manage tournaments[/bold green]\n")
         console.print("1) Create a tournament")
         console.print("2) Add players to a tournament")
-        console.print("3) Start a tournament")
+        console.print("3) Play a tournament")
         console.print("4)[red] Back [/red]")
 
     def show_manage_players_menu(self):
         """
         Display the player management menu.
-
-        Shows options for viewing all players, adding new players, or going back.
+        Displays options for display all players, adding new players, or going back
         """
 
-        console.print("\n[bold green]Manage Players :[/bold green]\n")
+        console.print("\n[bold green]Manage Players[/bold green]\n")
         console.print("1) See all players")
         console.print("2) Add players")
         console.print("[red]3) Back [/red]")
 
-    def show_start_tournament_menu(self):
+    def show_play_tournament_menu(self):
         """
-        Display the start tournament menu
-
-        Show options
+        Display the play tournament menu
+        Show options for create a new round, update the actual round, finish the tournament or go back
         """
-        console.print("[bold green]\nStart Tournament[/bold green]")
+        console.print("[bold green]\Play Tournament[/bold green]")
         console.print("\n1) Create a new round ")
-        console.print("2) Update the actual round")
+        console.print("2) Update results actual round")
         console.print("3) Finish the tournament")
         console.print("4)[red] Back[/red]")
 
     def show_select_tournament(self, tournaments):
+        """ Display all the tournaments and going back option"""
 
         tournament_table = Table(title="\n[bold green]\nTournaments[bold green]")
         tournament_table.add_column("OPTION")
@@ -99,6 +87,7 @@ class View:
         console.print(f"{len(tournaments)+1})[red] Back[/red]")
 
     def show_games_list(self, round):
+        """ from a round, display all the games """
         console.print(f"[bold green]\n{round.name}\n[/bold green]")
 
         games_list = round.games_list
@@ -109,7 +98,7 @@ class View:
 
     
     def update_game_result(self, round_name, game) :
-        """return the winner of the game"""
+        """ask user winner of game and return the winner of the game"""
         console.print(f"[bold green]\n{round_name}\n[/bold green]")
         player1 = game.player1_tournament
         player2 = game.player2_tournament
@@ -121,7 +110,7 @@ class View:
             console.print("")
             console.print("3) Draw")
         
-            user_choice = int(input(f"\n Enter the number of the winner (1 or 2) or draw (3) :"))
+            user_choice = int(input(f"\n Select the winner (1 or 2) or draw (3) :"))
             if user_choice == 1 :
                 return player1
             elif user_choice == 2 :
@@ -129,23 +118,24 @@ class View:
             elif user_choice == 3 :
                 return None
             else :
-                console.print("Please choose a choice between 1 and 3")
+                console.print("Please select an option between 1 and 3")
 
     def reports_menu(self):
-        "Display the reports menu"
+        "Display the reports menu options"
         console.print("[bold green]\nREPORTS\n[/bold green]")
         console.print("1) Display all players")
         console.print("2) Display all tournaments")
         console.print("3)[red] Back[/red]")
 
     def reports_tournament_menu(self):
-        "Display the tournament menu"
+        "Display the tournament menu options"
         console.print("[bold green]\nTournament report\n[/bold green]")
         console.print("1) Display tournament players")
         console.print("2) Display tournament rounds and games")
         console.print("3)[red] Back[/red]")
 
     def display_players(self, players) :
+        "Display the players sorted by alphabetical order "
         players_sorted = sorted(players, key=lambda p: p.surname)
         table = Table(title="[bold green]\nPlayers[/bold green]")
         table.add_column("Surname", justify="center")
@@ -159,6 +149,7 @@ class View:
         console.print(table)
 
     def display_players_tournament(self, players):
+        """ Display all the players_tournament of a tournament, sorted by alphabetical order """
         players_sorted = sorted(players, key=lambda p: p.surname)
         table = Table(title="[bold green]\nPlayers tournament[/bold green]")
         table.add_column("Surname", justify="center")
@@ -174,6 +165,7 @@ class View:
         console.print(table)
 
     def display_tournament_rounds(self, tournament):
+        """ Display a tree of the games history of the tournament"""
         tree = Tree(f"[bold green]{tournament.tournament_name}[/bold green]\n")
         for round in tournament.rounds :
             round_tree = tree.add(f"[bold green]{round.name}[/bold green]\n")
@@ -186,6 +178,7 @@ class View:
         console.print(f"\n", tree)
 
     def display_rank_players(self, tournament) :
+        """ Display all players of a tournament sorted from highest to lowest total score"""
         players_sorted = sorted(tournament.players, key=lambda player : player.total_points, reverse=True)
         table = Table(title = "[bold green]Players rank[/bold green]")
         table.add_column("Rank place", justify="center")
