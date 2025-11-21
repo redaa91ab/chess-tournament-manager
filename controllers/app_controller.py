@@ -1,7 +1,7 @@
 from views import View
 from .players_controller import PlayersController
 from .tournaments_controller import TournamentsController
-from rich import print
+
 
 class AppController:
     """
@@ -32,21 +32,15 @@ class AppController:
         manage tournaments, players, reports, or exit.
         """
 
-        while True :
+        while True:
             self.view.show_main_menu()
             user_choice = self.tournament.get_valid_choice(4)
 
-            if user_choice == 1 :
-                self.tournament.manage_tournaments()    
-            elif user_choice == 2 :
+            if user_choice == 1:
+                self.tournament.manage_tournaments()
+            elif user_choice == 2:
                 self.players.manage_players()
-            elif user_choice == 3 :
+            elif user_choice == 3:
                 self.tournament.reports_menu()
-            elif user_choice == 4 :
+            elif user_choice == 4:
                 break
-
-
-    
-
-    
-

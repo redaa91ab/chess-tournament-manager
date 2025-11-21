@@ -3,6 +3,7 @@ from tinydb import TinyDB
 db_players = TinyDB("data/players.json")
 players_table = db_players.table("players")
 
+
 class Player:
     """
     A class representing a chess player and storing details.
@@ -20,9 +21,9 @@ class Player:
             birthdate : The birthdate.
         """
         self.national_chess_id = national_chess_id
-        self.name = name   
+        self.name = name
         self.surname = surname
-        self.birthdate = birthdate        
+        self.birthdate = birthdate
 
     def serialize(self):
         """Return a dict"""
@@ -39,21 +40,24 @@ class Player:
         """Retrieve player's details with nid
         Return the player object"""
         for player in players_table.all():
-            if player["national_chess_id"] == national_chess_id :
+            if player["national_chess_id"] == national_chess_id:
                 national_chess_id = player["national_chess_id"]
                 name = player["name"]
                 surname = player["surname"]
                 birthdate = player["birthdate"]
                 player = Player(national_chess_id, name, surname, birthdate)
                 return player
-    
-        return None
-    
-    @classmethod
-    def deserialize_all_players(cls) :
-        """ return a list of all players object """
 
-        players = [Player.deserialize(player_serialized["national_chess_id"]) for player_serialized in players_table.all()]
+        return None
+
+    @classmethod
+    def deserialize_all_players(cls):
+        """return a list of all players object"""
+
+        players = [
+            Player.deserialize(player_serialized["national_chess_id"])
+            for player_serialized in players_table.all()
+        ]
 
         return players
 
